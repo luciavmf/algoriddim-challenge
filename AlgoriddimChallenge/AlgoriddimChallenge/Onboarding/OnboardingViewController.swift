@@ -42,12 +42,20 @@ final class OnboardingViewController: UIViewController {
         return pageControl
     }()
 
+    private var logoView: UIImageView = {
+        let uiimageView = UIImageView()
+        uiimageView.contentMode = .scaleAspectFit
+        uiimageView.image = UIImage(named: "Logo")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
+        return uiimageView
+    }()
+
     // MARK: UIViewController Life Cycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
         layoutBackground()
+        layoutLogo()
         layoutSharedComponents()
     }
 
@@ -80,6 +88,16 @@ final class OnboardingViewController: UIViewController {
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
             pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+        ])
+    }
+
+    private func layoutLogo() {
+        logoView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(logoView)
+
+        NSLayoutConstraint.activate([
+            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1)
         ])
     }
 
