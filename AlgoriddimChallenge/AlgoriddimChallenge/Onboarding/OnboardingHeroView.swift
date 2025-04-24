@@ -15,7 +15,6 @@ struct LogoSize {
 final class OnboardingHeroView: UIView {
     @MainActor
     private struct LabelConstants {
-        static var fontSize: CGFloat = DeviceScreenSize.width <= 375 ? 22 : 34
         static var numberOfLines: Int = DeviceScreenSize.width <= 375 ? 1 : 0
     }
 
@@ -39,7 +38,7 @@ final class OnboardingHeroView: UIView {
     private var titleLabel: UILabel  = {
         let label = UILabel()
         label.text = "Mix Your Favorite Music"
-        label.font = .systemFont(ofSize: LabelConstants.fontSize, weight: .bold)
+        label.font = .systemFont(ofSize: FontConstants.titleFontSize, weight: .bold)
         label.numberOfLines = LabelConstants.numberOfLines
         label.textAlignment = .center
         label.textColor = .white

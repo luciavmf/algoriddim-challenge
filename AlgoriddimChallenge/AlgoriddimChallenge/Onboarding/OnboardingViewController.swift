@@ -58,6 +58,7 @@ final class OnboardingViewController: UIViewController {
     private var sharedComponentsConstraints = Constraints()
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
+    private var selectLevelView = OnboardingSelectLevelView()
 
     // MARK: Other properties
 
@@ -72,8 +73,10 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
+
         layoutSharedComponents()
 
+        layoutSelectLevelView()
         layoutWelcomeView()
         layoutHeroView()
 
@@ -129,7 +132,7 @@ final class OnboardingViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
             welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
@@ -141,9 +144,21 @@ final class OnboardingViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
             heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+    }
+
+    private func layoutSelectLevelView() {
+        selectLevelView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(selectLevelView)
+
+        NSLayoutConstraint.activate([
+            selectLevelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            selectLevelView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
+            selectLevelView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+            selectLevelView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal)
         ])
     }
 
@@ -200,6 +215,7 @@ final class OnboardingViewController: UIViewController {
             animateHeroView(animateBackwards: animateBackwards)
 
         case .selectLevel:
+            selectLevelView.isHidden = false
             isAnimating = false
             setInteraction(enabled: true)
             heroView.isHidden = true
@@ -227,6 +243,7 @@ final class OnboardingViewController: UIViewController {
         }
 
         heroView.isHidden = true
+        selectLevelView.isHidden = true
         isAnimating = false
         setInteraction(enabled: true)
     }

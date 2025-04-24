@@ -13,4 +13,5 @@ extension UIColor {
     static let gradientBottom = UIColor(red: 80 / 255.0, green: 80 / 255.0, blue: 115 / 255.0, alpha: 1)
     static let algoriddimBlue = UIColor(red: 51 / 255.0, green: 153 / 255.0, blue: 1, alpha: 1)
     static let pageIndicatorTint = UIColor(white: 1, alpha: 0.3)
+    static let checkboxBackround = UIColor(red: 1, green: 1, blue: 1, alpha: 0.1)
 }

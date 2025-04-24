@@ -21,6 +21,10 @@ struct Paddings {
     static var third: CGFloat {
         DeviceScreenSize.width <= 375 ? 12 : 24
     }
+
+    static var checkbox: CGFloat {
+        DeviceScreenSize.width <= 375 ? 6 : 12
+    }
 }
 
 @MainActor
@@ -28,4 +32,9 @@ struct Paddings {
 struct DeviceScreenSize {
     static var width: CGFloat =
         min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+}
+
+@MainActor
+struct FontConstants {
+    static var titleFontSize: CGFloat = DeviceScreenSize.width <= 375 ? 22 : 34
 }
