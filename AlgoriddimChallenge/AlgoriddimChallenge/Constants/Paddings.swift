@@ -14,7 +14,15 @@ struct Paddings {
     private static var deviceWidth: CGFloat =
         min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
 
+    static var half: CGFloat {
+        Self.deviceWidth <= 375 ? 8 : 16
+    }
+
     static var normal: CGFloat {
         Self.deviceWidth <= 375 ? 16 : 32
+    }
+
+    static var third: CGFloat {
+        Self.deviceWidth <= 375 ? 12 : 24
     }
 }
