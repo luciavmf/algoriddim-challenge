@@ -49,6 +49,14 @@ final class OnboardingViewController: UIViewController {
         return uiimageView
     }()
 
+    private var welcomeLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Welcome to djay!"
+        label.font = .systemFont(ofSize: 22, weight: .regular)
+        label.textColor = .white
+        return label
+    }()
+
     // MARK: UIViewController Life Cycle
 
     override func viewDidLoad() {
@@ -57,6 +65,7 @@ final class OnboardingViewController: UIViewController {
         layoutBackground()
         layoutLogo()
         layoutSharedComponents()
+        layoutWelcomeLabel()
     }
 
     // MARK: Layout
@@ -99,6 +108,13 @@ final class OnboardingViewController: UIViewController {
             logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1)
         ])
+    }
+
+    private func layoutWelcomeLabel() {
+        welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(welcomeLabel)
+        welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third).isActive = true
     }
 
     // MARK: UI Actions
