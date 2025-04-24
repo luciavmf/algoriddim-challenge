@@ -52,6 +52,7 @@ final class OnboardingViewController: UIViewController {
 
     private var sharedComponentsConstraints = Constraints()
     private var welcomeView = OnboardingWelcomeView()
+    private var heroView = OnboardingHeroView()
 
     // MARK: UIViewController Life Cycle
 
@@ -62,8 +63,10 @@ final class OnboardingViewController: UIViewController {
         layoutSharedComponents()
 
         layoutWelcomeView()
+        layoutHeroView()
 
         activateCurrentConstraints()
+        updatePage(to: 0)
     }
 
     // MARK: Layout
@@ -120,6 +123,18 @@ final class OnboardingViewController: UIViewController {
         ])
     }
 
+    private func layoutHeroView() {
+        heroView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(heroView)
+
+        NSLayoutConstraint.activate([
+            heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            heroView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            heroView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+    }
+
     // MARK: Landscape - Portrait
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -141,10 +156,36 @@ final class OnboardingViewController: UIViewController {
     // MARK: UI Actions
 
     @objc private func continueToNextScreen() {
+        guard pageControl.currentPage < OnboardingPage.allCases.count - 1 else {
+            return
+        }
 
+        pageControl.currentPage += 1
+        updatePage(to: pageControl.currentPage)
     }
 
     @objc private func pageChanged(_ sender: UIPageControl) {
+        updatePage(to: sender.currentPage)
+    }
 
+    private func updatePage(to page: Int) {
+        let currentPage = OnboardingPage(rawValue: page) ?? .welcome
+
+        switch currentPage {
+        case .welcome:
+            welcomeView.isHidden = false
+            heroView.isHidden = true
+
+        case .hero:
+            welcomeView.isHidden = true
+            heroView.isHidden = false
+            heroView.setNeedsLayout()
+
+        case .selectLevel:
+            heroView.isHidden = true
+
+        case .custom:
+            heroView.isHidden = true
+        }
     }
 }
