@@ -6,3 +6,6 @@
 ---
 Algoriddim Challenge
 
+## Dependencies
+The project uses the [SwiftLint](https://swiftpackageindex.com/realm/SwiftLint) package to enforce common conventions. 
+

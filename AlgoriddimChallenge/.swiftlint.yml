@@ -1,0 +1,8 @@
+# By default, SwiftLint uses a set of sensible default rules you can adjust:
+disabled_rules:
+  - line_length
+  - static_over_final_class
+
+
+opt_in_rules: # some rules are turned off by default, so you need to opt-in
+  - implicit_return # find all the available rules by running: `swiftlint rules`

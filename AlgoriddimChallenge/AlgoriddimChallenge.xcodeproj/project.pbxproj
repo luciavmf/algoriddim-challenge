@@ -115,6 +115,7 @@
 				84A6399B2DBA53A900567870 /* Sources */,
 				84A6399C2DBA53A900567870 /* Frameworks */,
 				84A6399D2DBA53A900567870 /* Resources */,
+				84A639E72DBA5B6200567870 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -208,6 +209,9 @@
 			);
 			mainGroup = 84A639962DBA53A900567870;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				84A639E62DBA5AB600567870 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 84A639A02DBA53A900567870 /* Products */;
 			projectDirPath = "";
@@ -243,6 +247,27 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		84A639E72DBA5B6200567870 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "SWIFT_PACKAGE_DIR=\"${BUILD_DIR%Build/*}SourcePackages/artifacts\"\nSWIFTLINT_CMD=$(ls \"$SWIFT_PACKAGE_DIR\"/swiftlintplugins/SwiftLintBinary/SwiftLintBinary.artifactbundle/swiftlint-*-macos/bin/swiftlint | head -n 1)\n\nif test -f \"$SWIFTLINT_CMD\" 2>&1\nthen\n    \"$SWIFTLINT_CMD\"\nelse\n    echo \"warning: `swiftlint` command not found - See https://github.com/realm/SwiftLint#installation for installation instructions.\"\nfi\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		84A6399B2DBA53A900567870 /* Sources */ = {
@@ -290,6 +315,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44DMMFA3SQ;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AlgoriddimChallenge/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -321,6 +347,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 44DMMFA3SQ;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = AlgoriddimChallenge/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.music";
@@ -577,6 +604,17 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		84A639E62DBA5AB600567870 /* XCRemoteSwiftPackageReference "SwiftLintPlugins" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SimplyDanny/SwiftLintPlugins";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.59.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
 	};
 	rootObject = 84A639972DBA53A900567870 /* Project object */;
 }
