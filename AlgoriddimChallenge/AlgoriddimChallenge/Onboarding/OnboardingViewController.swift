@@ -63,9 +63,9 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
-        layoutLogo()
         layoutSharedComponents()
-        layoutWelcomeLabel()
+
+        layoutWelcomePage()
     }
 
     // MARK: Layout
@@ -100,21 +100,19 @@ final class OnboardingViewController: UIViewController {
         ])
     }
 
-    private func layoutLogo() {
+    private func layoutWelcomePage() {
         logoView.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(logoView)
 
-        NSLayoutConstraint.activate([
-            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1)
-        ])
-    }
-
-    private func layoutWelcomeLabel() {
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(welcomeLabel)
-        welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third).isActive = true
+
+        NSLayoutConstraint.activate([
+            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1),
+            welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
+        ])
     }
 
     // MARK: UI Actions
