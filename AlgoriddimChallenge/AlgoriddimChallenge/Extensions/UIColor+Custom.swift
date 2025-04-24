@@ -11,4 +11,5 @@ import UIKit
 extension UIColor {
     static let gradientTop = UIColor(red: 2 / 255.0, green: 2 / 255.0, blue: 3 / 255.0, alpha: 1)
     static let gradientBottom = UIColor(red: 80 / 255.0, green: 80 / 255.0, blue: 115 / 255.0, alpha: 1)
+    static let algoriddimBlue = UIColor(red: 51 / 255.0, green: 153 / 255.0, blue: 1, alpha: 1)
 }

@@ -8,7 +8,20 @@
 import UIKit
 
 final class OnboardingViewController: UIViewController {
+    /// The sizes that are used only for the shared components.
+    private struct SharedComponentSizes {
+        static let buttonHeight: CGFloat = 44
+    }
+
     private var backgroundView = LinearGradientView(colors: [UIColor.gradientTop.cgColor, UIColor.gradientBottom.cgColor])
+
+    private lazy var onboardingButton: OnboardingButton = {
+        OnboardingButton(
+            title: "Continue",
+            target: self,
+            action: #selector(continueToNextScreen)
+        )
+    }()
 
     // MARK: UIViewController Life Cycle
 
@@ -16,6 +29,7 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
+        layoutButton()
     }
 
     // MARK: Layout
@@ -30,5 +44,23 @@ final class OnboardingViewController: UIViewController {
             backgroundView.topAnchor.constraint(equalTo: view.topAnchor),
             backgroundView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+
+    private func layoutButton() {
+        onboardingButton.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(onboardingButton)
+
+        NSLayoutConstraint.activate([
+            onboardingButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.normal),
+            onboardingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.normal),
+            onboardingButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.normal),
+            onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight)
+        ])
+    }
+
+    // MARK: UI Actions
+
+    @objc private func continueToNextScreen() {
+
     }
 }
