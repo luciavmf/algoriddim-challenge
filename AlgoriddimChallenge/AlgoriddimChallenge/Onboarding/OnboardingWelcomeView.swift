@@ -8,7 +8,8 @@
 import UIKit
 
 final class OnboardingWelcomeView: UIView {
-    private var dinamycConstraints = Constraints()
+    private var dinamycConstraints = AnimatedConstraints()
+    public var isAnimating: Bool = false
 
     private var logoView: UIImageView = {
         let uiimageView = UIImageView()
@@ -32,42 +33,70 @@ final class OnboardingWelcomeView: UIView {
         super.init(frame: frame)
 
         layoutWelcomePage()
-        activateCurrentConstraints()
+        activateConstraints()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
         layoutWelcomePage()
-        activateCurrentConstraints()
+        activateConstraints()
     }
 
     // MARK: Layout
 
     private func layoutWelcomePage() {
+        clipsToBounds = true
         logoView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(logoView)
 
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(welcomeLabel)
 
-        dinamycConstraints.portrait = [
+        dinamycConstraints.animationIn = [
+            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
             logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.third)
         ]
+
+        dinamycConstraints.animationOut = [
+            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
+            welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.third + 44)
+        ]
     }
 
-    // MARK: Landscape - Portrait
-
-    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
-        super.traitCollectionDidChange(previousTraitCollection)
-
-        activateCurrentConstraints()
+    private func activateConstraints() {
+        NSLayoutConstraint.activate(dinamycConstraints.animationIn)
     }
 
-    private func activateCurrentConstraints() {
-        NSLayoutConstraint.activate(dinamycConstraints.portrait)
+    // MARK: Animation
+
+    func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+        logoView.isHidden = true
+        if backwards {
+            NSLayoutConstraint.deactivate(dinamycConstraints.animationOut)
+            NSLayoutConstraint.activate(dinamycConstraints.animationIn)
+        } else {
+            NSLayoutConstraint.deactivate(dinamycConstraints.animationIn)
+            NSLayoutConstraint.activate(dinamycConstraints.animationOut)
+        }
+
+        UIView.animate(
+            withDuration: AnimationDuration.normal,
+            delay: 0,
+            options: [.curveEaseInOut],
+            animations: { [weak self] in
+                self?.layoutIfNeeded()
+            },
+            completion: {  [weak self] _ in
+                self?.logoView.isHidden = false
+                completion()
+            }
+        )
     }
 }

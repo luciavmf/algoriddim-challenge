@@ -13,6 +13,11 @@ struct Constraints {
     var portrait: [NSLayoutConstraint] = []
 }
 
+struct AnimatedConstraints {
+    var animationIn: [NSLayoutConstraint] = []
+    var animationOut: [NSLayoutConstraint] = []
+}
+
 final class OnboardingViewController: UIViewController {
     /// The onboarding pages.
     private enum OnboardingPage: Int, CaseIterable {
@@ -54,6 +59,13 @@ final class OnboardingViewController: UIViewController {
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
 
+    // MARK: Other properties
+
+    private var currentPageIndex: Int = 0
+
+    // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
+    private var isAnimating: Bool = false
+
     // MARK: UIViewController Life Cycle
 
     override func viewDidLoad() {
@@ -66,7 +78,7 @@ final class OnboardingViewController: UIViewController {
         layoutHeroView()
 
         activateCurrentConstraints()
-        updatePage(to: 0)
+        animatePage(to: currentPageIndex)
     }
 
     // MARK: Layout
@@ -156,36 +168,90 @@ final class OnboardingViewController: UIViewController {
     // MARK: UI Actions
 
     @objc private func continueToNextScreen() {
-        guard pageControl.currentPage < OnboardingPage.allCases.count - 1 else {
+        guard pageControl.currentPage < OnboardingPage.allCases.count - 1, !isAnimating else {
             return
         }
 
         pageControl.currentPage += 1
-        updatePage(to: pageControl.currentPage)
+        animatePage(to: pageControl.currentPage)
     }
 
     @objc private func pageChanged(_ sender: UIPageControl) {
-        updatePage(to: sender.currentPage)
+        animatePage(to: sender.currentPage)
     }
 
-    private func updatePage(to page: Int) {
+    private func animatePage(to page: Int) {
+        // Prevent having overlapping animations.
+        guard !isAnimating else { return }
+
+        isAnimating = true
+        setInteraction(enabled: false)
+
+        let animateBackwards = page < currentPageIndex
+        currentPageIndex = page
+
         let currentPage = OnboardingPage(rawValue: page) ?? .welcome
 
         switch currentPage {
         case .welcome:
-            welcomeView.isHidden = false
-            heroView.isHidden = true
+            animateWelcomeView(animateBackwards: animateBackwards)
 
         case .hero:
-            welcomeView.isHidden = true
-            heroView.isHidden = false
-            heroView.setNeedsLayout()
+            animateHeroView(animateBackwards: animateBackwards)
 
         case .selectLevel:
+            isAnimating = false
+            setInteraction(enabled: true)
             heroView.isHidden = true
 
         case .custom:
+            isAnimating = false
+            setInteraction(enabled: true)
             heroView.isHidden = true
         }
+    }
+
+    private func animateWelcomeView(animateBackwards: Bool) {
+        welcomeView.isHidden = false
+
+        if animateBackwards {
+            // Animate the view backwards when the previous page is the hero page.
+            welcomeView.animateTransitionOut(backwards: true)
+            heroView.animateTransitionIn(backwards: true) { [weak self] in
+                guard let self else { return }
+                self.heroView.isHidden = true
+                self.isAnimating = false
+                self.setInteraction(enabled: true)
+            }
+            return
+        }
+
+        heroView.isHidden = true
+        isAnimating = false
+        setInteraction(enabled: true)
+    }
+
+    private func animateHeroView(animateBackwards: Bool) {
+        if animateBackwards {
+            heroView.isHidden = false
+            setInteraction(enabled: true)
+            isAnimating = false
+            return
+        }
+
+        welcomeView.animateTransitionOut(completion: { [weak self] in
+            guard let self else { return }
+            self.welcomeView.isHidden = true
+            self.setInteraction(enabled: true)
+            self.isAnimating = false
+        })
+
+        heroView.isHidden = false
+        heroView.animateTransitionIn()
+    }
+
+    private func setInteraction(enabled: Bool) {
+        pageControl.isUserInteractionEnabled = enabled
+        onboardingButton.isUserInteractionEnabled = enabled
     }
 }
