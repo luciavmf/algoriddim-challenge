@@ -48,26 +48,10 @@ final class OnboardingViewController: UIViewController {
         return pageControl
     }()
 
-    private var logoView: UIImageView = {
-        let uiimageView = UIImageView()
-        uiimageView.contentMode = .scaleAspectFit
-        uiimageView.image = UIImage(named: "Logo")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
-        return uiimageView
-    }()
-
-    private var welcomeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Welcome to djay!"
-        label.font = .systemFont(ofSize: 22, weight: .regular)
-        label.textColor = .white
-        label.textAlignment = .center
-        return label
-    }()
-
     // MARK: Constraints
 
     private var sharedComponentsConstraints = Constraints()
-    private var welcomePageConstraints = Constraints()
+    private var welcomeView = OnboardingWelcomeView()
 
     // MARK: UIViewController Life Cycle
 
@@ -77,7 +61,7 @@ final class OnboardingViewController: UIViewController {
         layoutBackground()
         layoutSharedComponents()
 
-        layoutWelcomePage()
+        layoutWelcomeView()
 
         activateCurrentConstraints()
     }
@@ -124,29 +108,16 @@ final class OnboardingViewController: UIViewController {
         ]
     }
 
-    private func layoutWelcomePage() {
-        logoView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoView)
+    private func layoutWelcomeView() {
+        welcomeView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(welcomeView)
 
-        welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(welcomeLabel)
-
-        welcomePageConstraints.portrait = [
-            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1),
-            welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
-        ]
-
-        welcomePageConstraints.landscape = [
-            logoView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.half),
-            logoView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half),
-            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1),
-
-            welcomeLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.half),
-            welcomeLabel.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-            welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
-        ]
+        NSLayoutConstraint.activate([
+            welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
     }
 
     // MARK: Landscape - Portrait
@@ -159,14 +130,11 @@ final class OnboardingViewController: UIViewController {
 
     private func activateCurrentConstraints() {
         NSLayoutConstraint.deactivate(sharedComponentsConstraints.portrait + sharedComponentsConstraints.landscape)
-        NSLayoutConstraint.deactivate(welcomePageConstraints.portrait + welcomePageConstraints.landscape)
 
         if traitCollection.verticalSizeClass == .regular {
             NSLayoutConstraint.activate(sharedComponentsConstraints.portrait)
-            NSLayoutConstraint.activate(welcomePageConstraints.portrait)
         } else {
             NSLayoutConstraint.activate(sharedComponentsConstraints.landscape)
-            NSLayoutConstraint.activate(welcomePageConstraints.landscape)
         }
     }
 
