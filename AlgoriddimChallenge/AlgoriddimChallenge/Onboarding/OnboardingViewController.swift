@@ -7,6 +7,12 @@
 
 import UIKit
 
+/// A struct containing the constraints in landscape and portrait mode.
+struct Constraints {
+    var landscape: [NSLayoutConstraint] = []
+    var portrait: [NSLayoutConstraint] = []
+}
+
 final class OnboardingViewController: UIViewController {
     /// The onboarding pages.
     private enum OnboardingPage: Int, CaseIterable {
@@ -57,6 +63,10 @@ final class OnboardingViewController: UIViewController {
         return label
     }()
 
+    // MARK: Constraints
+
+    private var sharedComponentsConstraints = Constraints()
+
     // MARK: UIViewController Life Cycle
 
     override func viewDidLoad() {
@@ -66,6 +76,8 @@ final class OnboardingViewController: UIViewController {
         layoutSharedComponents()
 
         layoutWelcomePage()
+
+        activateCurrentConstraints()
     }
 
     // MARK: Layout
@@ -89,7 +101,7 @@ final class OnboardingViewController: UIViewController {
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(pageControl)
 
-        NSLayoutConstraint.activate([
+        sharedComponentsConstraints.portrait = [
             onboardingButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.normal),
             onboardingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.normal),
             onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
@@ -97,7 +109,17 @@ final class OnboardingViewController: UIViewController {
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
             pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
-        ])
+        ]
+
+        sharedComponentsConstraints.landscape = [
+            onboardingButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: Paddings.half * -2),
+            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.half),
+            onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.normal),
+            onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
+            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
+            pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+        ]
     }
 
     private func layoutWelcomePage() {
@@ -113,6 +135,24 @@ final class OnboardingViewController: UIViewController {
             welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
         ])
+    }
+
+    // MARK: Landscape - Portrait
+
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        activateCurrentConstraints()
+    }
+
+    private func activateCurrentConstraints() {
+        NSLayoutConstraint.deactivate(sharedComponentsConstraints.portrait + sharedComponentsConstraints.landscape)
+
+        if traitCollection.verticalSizeClass == .regular {
+            NSLayoutConstraint.activate(sharedComponentsConstraints.portrait)
+        } else {
+            NSLayoutConstraint.activate(sharedComponentsConstraints.landscape)
+        }
     }
 
     // MARK: UI Actions
