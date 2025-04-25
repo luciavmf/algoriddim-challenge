@@ -14,6 +14,13 @@ final class OnboardingHeroView: UIView {
         static var numberOfLines: Int = DeviceScreenSize.width <= 375 ? 1 : 0
     }
 
+    private var logoView: UIImageView = {
+        let uiimageView = UIImageView()
+        uiimageView.contentMode = .scaleAspectFit
+        uiimageView.image = UIImage(named: "Logo")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
+        return uiimageView
+    }()
+
     private var heroView: UIImageView = {
         let uiimageView = UIImageView()
         uiimageView.contentMode = .scaleAspectFit
@@ -44,7 +51,7 @@ final class OnboardingHeroView: UIView {
     }()
 
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [heroView, titleLabel, appleDesignAwardView])
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, appleDesignAwardView])
         stackView.axis = .vertical
         stackView.distribution = .fill
         stackView.spacing = Paddings.normal
@@ -58,36 +65,54 @@ final class OnboardingHeroView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
 
-        layoutStackView()
+        layoutChildren()
         activateCurrentConstraints()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
-        layoutStackView()
+        layoutChildren()
         activateCurrentConstraints()
     }
 
     // MARK: Layout
 
-    private func layoutStackView() {
-        addSubview(stackView)
-
+    private func layoutChildren() {
+        logoView.translatesAutoresizingMaskIntoConstraints = false
         stackView.translatesAutoresizingMaskIntoConstraints = false
+        heroView.translatesAutoresizingMaskIntoConstraints = false
+
+        addSubview(heroView)
+        addSubview(stackView)
+        addSubview(logoView)
 
         dynamicConstraints.portrait = [
+            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: -Paddings.normal),
+            logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
+            logoView.heightAnchor.constraint(equalToConstant: 64),
+            heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+            heroView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+            heroView.bottomAnchor.constraint(equalTo: stackView.topAnchor, constant: -Paddings.normal),
             stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.normal)
         ]
 
         dynamicConstraints.landscape = [
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-            stackView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-            stackView.topAnchor.constraint(equalTo: topAnchor),
-            stackView.bottomAnchor.constraint(equalTo: bottomAnchor)
+            logoView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Paddings.half),
+            logoView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
+            logoView.heightAnchor.constraint(equalToConstant: 64),
+            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: Paddings.normal),
+
+            heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+            heroView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
+            heroView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.normal),
+
+            stackView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Paddings.normal),
+            stackView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.normal),
+            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+            stackView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2)
         ]
     }
 
