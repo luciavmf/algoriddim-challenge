@@ -10,19 +10,22 @@ import UIKit
 /// The paddings of the screen. It's half for smaller screens
 @MainActor
 struct Paddings {
-    // If the app is started in landscape mode then the width is equal to the UIScreen height, so we take the min of both values.
-    private static var deviceWidth: CGFloat =
-        min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
-
     static var half: CGFloat {
-        Self.deviceWidth <= 375 ? 8 : 16
+        DeviceScreenSize.width <= 375 ? 8 : 16
     }
 
     static var normal: CGFloat {
-        Self.deviceWidth <= 375 ? 16 : 32
+        DeviceScreenSize.width <= 375 ? 16 : 32
     }
 
     static var third: CGFloat {
-        Self.deviceWidth <= 375 ? 12 : 24
+        DeviceScreenSize.width <= 375 ? 12 : 24
     }
+}
+
+@MainActor
+/// The device screen size. If the app is started in landscape mode then the width is equal to the UIScreen height, so we take the min of both values.
+struct DeviceScreenSize {
+    static var width: CGFloat =
+        min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
 }

@@ -13,6 +13,11 @@ struct Constraints {
     var portrait: [NSLayoutConstraint] = []
 }
 
+struct AnimatedConstraints {
+    var animationIn: [NSLayoutConstraint] = []
+    var animationOut: [NSLayoutConstraint] = []
+}
+
 final class OnboardingViewController: UIViewController {
     /// The onboarding pages.
     private enum OnboardingPage: Int, CaseIterable {
@@ -48,26 +53,18 @@ final class OnboardingViewController: UIViewController {
         return pageControl
     }()
 
-    private var logoView: UIImageView = {
-        let uiimageView = UIImageView()
-        uiimageView.contentMode = .scaleAspectFit
-        uiimageView.image = UIImage(named: "Logo")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
-        return uiimageView
-    }()
-
-    private var welcomeLabel: UILabel = {
-        let label = UILabel()
-        label.text = "Welcome to djay!"
-        label.font = .systemFont(ofSize: 22, weight: .regular)
-        label.textColor = .white
-        label.textAlignment = .center
-        return label
-    }()
-
     // MARK: Constraints
 
     private var sharedComponentsConstraints = Constraints()
-    private var welcomePageConstraints = Constraints()
+    private var welcomeView = OnboardingWelcomeView()
+    private var heroView = OnboardingHeroView()
+
+    // MARK: Other properties
+
+    private var currentPageIndex: Int = 0
+
+    // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
+    private var isAnimating: Bool = false
 
     // MARK: UIViewController Life Cycle
 
@@ -77,9 +74,11 @@ final class OnboardingViewController: UIViewController {
         layoutBackground()
         layoutSharedComponents()
 
-        layoutWelcomePage()
+        layoutWelcomeView()
+        layoutHeroView()
 
         activateCurrentConstraints()
+        animatePage(to: currentPageIndex)
     }
 
     // MARK: Layout
@@ -114,9 +113,9 @@ final class OnboardingViewController: UIViewController {
         ]
 
         sharedComponentsConstraints.landscape = [
+            onboardingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
             onboardingButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: Paddings.half * -2),
-            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.half),
-            onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.normal),
+            onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.half),
             onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
@@ -124,29 +123,28 @@ final class OnboardingViewController: UIViewController {
         ]
     }
 
-    private func layoutWelcomePage() {
-        logoView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(logoView)
+    private func layoutWelcomeView() {
+        welcomeView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(welcomeView)
 
-        welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(welcomeLabel)
+        NSLayoutConstraint.activate([
+            welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+    }
 
-        welcomePageConstraints.portrait = [
-            logoView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1),
-            welcomeLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
-        ]
+    private func layoutHeroView() {
+        heroView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(heroView)
 
-        welcomePageConstraints.landscape = [
-            logoView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.half),
-            logoView.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half),
-            logoView.centerYAnchor.constraint(equalTo: view.centerYAnchor, constant: view.bounds.height * -0.1),
-
-            welcomeLabel.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.half),
-            welcomeLabel.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-            welcomeLabel.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.third)
-        ]
+        NSLayoutConstraint.activate([
+            heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            heroView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            heroView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
     }
 
     // MARK: Landscape - Portrait
@@ -159,24 +157,101 @@ final class OnboardingViewController: UIViewController {
 
     private func activateCurrentConstraints() {
         NSLayoutConstraint.deactivate(sharedComponentsConstraints.portrait + sharedComponentsConstraints.landscape)
-        NSLayoutConstraint.deactivate(welcomePageConstraints.portrait + welcomePageConstraints.landscape)
 
         if traitCollection.verticalSizeClass == .regular {
             NSLayoutConstraint.activate(sharedComponentsConstraints.portrait)
-            NSLayoutConstraint.activate(welcomePageConstraints.portrait)
         } else {
             NSLayoutConstraint.activate(sharedComponentsConstraints.landscape)
-            NSLayoutConstraint.activate(welcomePageConstraints.landscape)
         }
     }
 
     // MARK: UI Actions
 
     @objc private func continueToNextScreen() {
+        guard pageControl.currentPage < OnboardingPage.allCases.count - 1, !isAnimating else {
+            return
+        }
 
+        pageControl.currentPage += 1
+        animatePage(to: pageControl.currentPage)
     }
 
     @objc private func pageChanged(_ sender: UIPageControl) {
+        animatePage(to: sender.currentPage)
+    }
 
+    private func animatePage(to page: Int) {
+        // Prevent having overlapping animations.
+        guard !isAnimating else { return }
+
+        isAnimating = true
+        setInteraction(enabled: false)
+
+        let animateBackwards = page < currentPageIndex
+        currentPageIndex = page
+
+        let currentPage = OnboardingPage(rawValue: page) ?? .welcome
+
+        switch currentPage {
+        case .welcome:
+            animateWelcomeView(animateBackwards: animateBackwards)
+
+        case .hero:
+            animateHeroView(animateBackwards: animateBackwards)
+
+        case .selectLevel:
+            isAnimating = false
+            setInteraction(enabled: true)
+            heroView.isHidden = true
+
+        case .custom:
+            isAnimating = false
+            setInteraction(enabled: true)
+            heroView.isHidden = true
+        }
+    }
+
+    private func animateWelcomeView(animateBackwards: Bool) {
+        welcomeView.isHidden = false
+
+        if animateBackwards {
+            // Animate the view backwards when the previous page is the hero page.
+            welcomeView.animateTransitionOut(backwards: true)
+            heroView.animateTransitionIn(backwards: true) { [weak self] in
+                guard let self else { return }
+                self.heroView.isHidden = true
+                self.isAnimating = false
+                self.setInteraction(enabled: true)
+            }
+            return
+        }
+
+        heroView.isHidden = true
+        isAnimating = false
+        setInteraction(enabled: true)
+    }
+
+    private func animateHeroView(animateBackwards: Bool) {
+        if animateBackwards {
+            heroView.isHidden = false
+            setInteraction(enabled: true)
+            isAnimating = false
+            return
+        }
+
+        welcomeView.animateTransitionOut(completion: { [weak self] in
+            guard let self else { return }
+            self.welcomeView.isHidden = true
+            self.setInteraction(enabled: true)
+            self.isAnimating = false
+        })
+
+        heroView.isHidden = false
+        heroView.animateTransitionIn()
+    }
+
+    private func setInteraction(enabled: Bool) {
+        pageControl.isUserInteractionEnabled = enabled
+        onboardingButton.isUserInteractionEnabled = enabled
     }
 }

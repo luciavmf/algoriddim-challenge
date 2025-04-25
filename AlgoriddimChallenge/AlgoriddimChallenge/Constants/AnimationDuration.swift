@@ -9,4 +9,6 @@ import UIKit
 /// Common constants of the animation duration.
 struct AnimationDuration {
     static let fast: TimeInterval = 0.25
+    static let normal: TimeInterval = 0.5
+    static let slow: TimeInterval = 0.75
 }
