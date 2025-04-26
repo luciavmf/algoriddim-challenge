@@ -58,6 +58,7 @@ final class OnboardingViewController: UIViewController {
     private var sharedComponentsConstraints = Constraints()
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
+    private var selectLevelView = OnboardingSelectLevelView()
 
     // MARK: Other properties
 
@@ -72,8 +73,10 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
+
         layoutSharedComponents()
 
+        layoutSelectLevelView()
         layoutWelcomeView()
         layoutHeroView()
 
@@ -103,8 +106,8 @@ final class OnboardingViewController: UIViewController {
         view.addSubview(pageControl)
 
         sharedComponentsConstraints.portrait = [
-            onboardingButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.normal),
-            onboardingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.normal),
+            onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
             onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
             onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -129,7 +132,7 @@ final class OnboardingViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
             welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
@@ -141,9 +144,21 @@ final class OnboardingViewController: UIViewController {
 
         NSLayoutConstraint.activate([
             heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
-            heroView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            heroView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
+            heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+    }
+
+    private func layoutSelectLevelView() {
+        selectLevelView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(selectLevelView)
+
+        NSLayoutConstraint.activate([
+            selectLevelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            selectLevelView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
+            selectLevelView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+            selectLevelView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal)
         ])
     }
 
@@ -200,14 +215,10 @@ final class OnboardingViewController: UIViewController {
             animateHeroView(animateBackwards: animateBackwards)
 
         case .selectLevel:
-            isAnimating = false
-            setInteraction(enabled: true)
-            heroView.isHidden = true
+            animateSelectLevelView(animateBackwards: animateBackwards)
 
         case .custom:
-            isAnimating = false
-            setInteraction(enabled: true)
-            heroView.isHidden = true
+            animateCustomView(animateBackwards: animateBackwards)
         }
     }
 
@@ -227,6 +238,7 @@ final class OnboardingViewController: UIViewController {
         }
 
         heroView.isHidden = true
+        selectLevelView.isHidden = true
         isAnimating = false
         setInteraction(enabled: true)
     }
@@ -234,8 +246,13 @@ final class OnboardingViewController: UIViewController {
     private func animateHeroView(animateBackwards: Bool) {
         if animateBackwards {
             heroView.isHidden = false
+            heroView.animateTransitionOut(backwards: true)
             setInteraction(enabled: true)
-            isAnimating = false
+
+            selectLevelView.animateTransitionIn(backwards: true) { [weak self] in
+                self?.selectLevelView.isHidden = true
+                self?.isAnimating = false
+            }
             return
         }
 
@@ -248,6 +265,40 @@ final class OnboardingViewController: UIViewController {
 
         heroView.isHidden = false
         heroView.animateTransitionIn()
+    }
+
+    private func animateSelectLevelView(animateBackwards: Bool) {
+        if animateBackwards {
+            selectLevelView.isHidden = false
+            selectLevelView.animateTransitionOut(backwards: animateBackwards) { [weak self] in
+                guard let self else { return }
+                self.isAnimating = false
+                self.setInteraction(enabled: true)
+            }
+            return
+        }
+
+        heroView.animateTransitionOut { [weak self] in
+            guard let self else { return }
+            self.heroView.isHidden = true
+        }
+
+        selectLevelView.isHidden = false
+
+        selectLevelView.animateTransitionIn { [weak self] in
+            guard let self else { return }
+            self.isAnimating = false
+            self.setInteraction(enabled: true)
+        }
+    }
+
+    private func animateCustomView(animateBackwards: Bool) {
+        selectLevelView.animateTransitionOut { [weak self] in
+            guard let self else { return }
+            self.isAnimating = false
+            self.setInteraction(enabled: true)
+            self.selectLevelView.isHidden = true
+        }
     }
 
     private func setInteraction(enabled: Bool) {

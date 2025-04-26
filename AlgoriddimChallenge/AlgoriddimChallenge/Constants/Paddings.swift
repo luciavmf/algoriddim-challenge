@@ -21,11 +21,20 @@ struct Paddings {
     static var third: CGFloat {
         DeviceScreenSize.width <= 375 ? 12 : 24
     }
+
+    static var checkbox: CGFloat {
+        DeviceScreenSize.width <= 375 ? 6 : 12
+    }
 }
 
-@MainActor
 /// The device screen size. If the app is started in landscape mode then the width is equal to the UIScreen height, so we take the min of both values.
+@MainActor
 struct DeviceScreenSize {
     static var width: CGFloat =
         min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)
+}
+
+@MainActor
+struct FontConstants {
+    static var titleFontSize: CGFloat = DeviceScreenSize.width <= 375 ? 22 : 34
 }
