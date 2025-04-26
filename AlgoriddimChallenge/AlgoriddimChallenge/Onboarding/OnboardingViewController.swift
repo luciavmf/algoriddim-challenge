@@ -215,15 +215,10 @@ final class OnboardingViewController: UIViewController {
             animateHeroView(animateBackwards: animateBackwards)
 
         case .selectLevel:
-            selectLevelView.isHidden = false
-            isAnimating = false
-            setInteraction(enabled: true)
-            heroView.isHidden = true
+            animateSelectLevelView(animateBackwards: animateBackwards)
 
         case .custom:
-            isAnimating = false
-            setInteraction(enabled: true)
-            heroView.isHidden = true
+            animateCustomView(animateBackwards: animateBackwards)
         }
     }
 
@@ -251,8 +246,13 @@ final class OnboardingViewController: UIViewController {
     private func animateHeroView(animateBackwards: Bool) {
         if animateBackwards {
             heroView.isHidden = false
+            heroView.animateTransitionOut(backwards: true)
             setInteraction(enabled: true)
-            isAnimating = false
+
+            selectLevelView.animateTransitionIn(backwards: true) { [weak self] in
+                self?.selectLevelView.isHidden = true
+                self?.isAnimating = false
+            }
             return
         }
 
@@ -265,6 +265,40 @@ final class OnboardingViewController: UIViewController {
 
         heroView.isHidden = false
         heroView.animateTransitionIn()
+    }
+
+    private func animateSelectLevelView(animateBackwards: Bool) {
+        if animateBackwards {
+            selectLevelView.isHidden = false
+            selectLevelView.animateTransitionOut(backwards: animateBackwards) { [weak self] in
+                guard let self else { return }
+                self.isAnimating = false
+                self.setInteraction(enabled: true)
+            }
+            return
+        }
+
+        heroView.animateTransitionOut { [weak self] in
+            guard let self else { return }
+            self.heroView.isHidden = true
+        }
+
+        selectLevelView.isHidden = false
+
+        selectLevelView.animateTransitionIn { [weak self] in
+            guard let self else { return }
+            self.isAnimating = false
+            self.setInteraction(enabled: true)
+        }
+    }
+
+    private func animateCustomView(animateBackwards: Bool) {
+        selectLevelView.animateTransitionOut { [weak self] in
+            guard let self else { return }
+            self.isAnimating = false
+            self.setInteraction(enabled: true)
+            self.selectLevelView.isHidden = true
+        }
     }
 
     private func setInteraction(enabled: Bool) {

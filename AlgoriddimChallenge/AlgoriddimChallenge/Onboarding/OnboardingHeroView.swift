@@ -211,6 +211,10 @@ final class OnboardingHeroView: UIView {
         }
     }
 
+    func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+        slideAnimate(direction: .middleToLeft, backwards: backwards, completion: completion)
+    }
+
     private func animateLogo(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         deactivateConstraints()
 

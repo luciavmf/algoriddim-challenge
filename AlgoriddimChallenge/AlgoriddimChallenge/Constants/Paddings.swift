@@ -27,8 +27,8 @@ struct Paddings {
     }
 }
 
-@MainActor
 /// The device screen size. If the app is started in landscape mode then the width is equal to the UIScreen height, so we take the min of both values.
+@MainActor
 struct DeviceScreenSize {
     static var width: CGFloat =
         min(UIScreen.main.bounds.width, UIScreen.main.bounds.height)

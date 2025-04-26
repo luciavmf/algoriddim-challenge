@@ -182,4 +182,12 @@ final class OnboardingSelectLevelView: UIView {
             NSLayoutConstraint.activate(stackConstraints.landscape)
         }
     }
+
+    func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+        slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
+    }
+
+    func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+        slideAnimate(direction: .middleToLeft, backwards: backwards, completion: completion)
+    }
 }
