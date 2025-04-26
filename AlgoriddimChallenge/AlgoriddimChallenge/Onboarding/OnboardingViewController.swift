@@ -103,8 +103,8 @@ final class OnboardingViewController: UIViewController {
         view.addSubview(pageControl)
 
         sharedComponentsConstraints.portrait = [
-            onboardingButton.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: Paddings.normal),
-            onboardingButton.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -Paddings.normal),
+            onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
             onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
             onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
             pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
@@ -142,8 +142,8 @@ final class OnboardingViewController: UIViewController {
         NSLayoutConstraint.activate([
             heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
-            heroView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            heroView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+            heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
 
