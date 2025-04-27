@@ -24,18 +24,22 @@ enum SkillLevel: Sendable {
     case professional
 }
 
+/// The onboarding pages.
+enum OnboardingPage: Int, CaseIterable {
+    case welcome
+    case hero
+    case selectLevel
+    case custom
+}
+
+/// The properties of the OnboardingViewController.
 final class OnboardingViewModel {
+    var currentPage: OnboardingPage = .welcome
     var selectedSkillLevel: SkillLevel?
 }
 
+/// The Onboarding component.
 final class OnboardingViewController: UIViewController {
-    /// The onboarding pages.
-    private enum OnboardingPage: Int, CaseIterable {
-        case welcome
-        case hero
-        case selectLevel
-        case custom
-    }
 
     /// The sizes that are used only for the shared components.
     private struct SharedComponentSizes {
@@ -83,10 +87,6 @@ final class OnboardingViewController: UIViewController {
 
     private var customView = OnboardingCustomView()
 
-    // MARK: Other properties
-
-    private var currentPageIndex: Int = 0
-
     // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
     private var isAnimating: Bool = false
 
@@ -107,7 +107,7 @@ final class OnboardingViewController: UIViewController {
 
         activateCurrentConstraints()
 
-        animatePage(to: currentPageIndex)
+        animatePage(to: viewModel.currentPage.rawValue)
     }
 
     // MARK: Layout
@@ -206,12 +206,10 @@ final class OnboardingViewController: UIViewController {
         isAnimating = true
         setInteraction(enabled: false)
 
-        let animateBackwards = page < currentPageIndex
-        currentPageIndex = page
+        let animateBackwards = page < viewModel.currentPage.rawValue
+        viewModel.currentPage = OnboardingPage(rawValue: page) ?? .welcome
 
-        let currentPage = OnboardingPage(rawValue: page) ?? .welcome
-
-        switch currentPage {
+        switch viewModel.currentPage {
         case .welcome:
             animateWelcomeView(animateBackwards: animateBackwards)
 
