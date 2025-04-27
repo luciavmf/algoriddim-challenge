@@ -234,10 +234,9 @@ final class OnboardingViewController: UIViewController {
     }
 
     private func animateCustomView(animateBackwards: Bool) {
-        selectLevelView.animateTransitionOut { [weak self] in
-            guard let self else { return }
-            self.finalizeTransition(hiding: self.selectLevelView)
-        }
+        let viewIn: TransitionAnimatableView? = !animateBackwards ? customView : nil
+        let viewOut: TransitionAnimatableView? = !animateBackwards ? selectLevelView : nil
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
 
         onboardingButton.setTitle("Done", for: .normal)
     }
