@@ -213,18 +213,24 @@ final class OnboardingViewController: UIViewController {
         let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
 
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+
+        onboardingButton.setTitle("Continue", for: .normal)
     }
 
     private func animateHeroView(animateBackwards: Bool) {
         let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
         let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+
+        onboardingButton.setTitle("Continue", for: .normal)
     }
 
     private func animateSelectLevelView(animateBackwards: Bool) {
         let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
         let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+
+        onboardingButton.setTitle("Let's go", for: .normal)
     }
 
     private func animateCustomView(animateBackwards: Bool) {
@@ -232,6 +238,8 @@ final class OnboardingViewController: UIViewController {
             guard let self else { return }
             self.finalizeTransition(hiding: self.selectLevelView)
         }
+
+        onboardingButton.setTitle("Done", for: .normal)
     }
 
     private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
