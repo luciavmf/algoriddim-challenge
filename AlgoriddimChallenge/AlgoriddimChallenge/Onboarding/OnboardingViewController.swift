@@ -203,70 +203,40 @@ final class OnboardingViewController: UIViewController {
     }
 
     private func animateWelcomeView(animateBackwards: Bool) {
-        welcomeView.isHidden = false
+        let viewIn: TransitionAnimatableView? = !animateBackwards ? welcomeView : heroView
+        let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
 
-        if animateBackwards {
-            // Animate the view backwards when the previous page is the hero page.
-            welcomeView.animateTransitionOut(backwards: true)
-            heroView.animateTransitionIn(backwards: true) { [weak self] in
-                guard let self else { return }
-                self.finalizeTransition(hiding: self.heroView)
-            }
-            return
-        }
-
-        heroView.isHidden = true
-        finalizeTransition(hiding: selectLevelView)
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateHeroView(animateBackwards: Bool) {
-        if animateBackwards {
-            heroView.isHidden = false
-            heroView.animateTransitionOut(backwards: true)
-
-            selectLevelView.animateTransitionIn(backwards: true) { [weak self] in
-                guard let self else { return }
-                self.finalizeTransition(hiding: self.selectLevelView)
-            }
-            return
-        }
-
-        welcomeView.animateTransitionOut(completion: { [weak self] in
-            guard let self else { return }
-            self.finalizeTransition(hiding: self.welcomeView)
-        })
-
-        heroView.isHidden = false
-        heroView.animateTransitionIn()
+        let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+        let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateSelectLevelView(animateBackwards: Bool) {
-        if animateBackwards {
-            selectLevelView.isHidden = false
-            selectLevelView.animateTransitionOut(backwards: animateBackwards) { [weak self] in
-                guard let self else { return }
-                self.finalizeTransition()
-            }
-            return
-        }
-
-        heroView.animateTransitionOut { [weak self] in
-            guard let self else { return }
-            self.heroView.isHidden = true
-        }
-
-        selectLevelView.isHidden = false
-
-        selectLevelView.animateTransitionIn { [weak self] in
-            guard let self else { return }
-            self.finalizeTransition()
-        }
+        let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
+        let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateCustomView(animateBackwards: Bool) {
         selectLevelView.animateTransitionOut { [weak self] in
             guard let self else { return }
             self.finalizeTransition(hiding: self.selectLevelView)
+        }
+    }
+
+    private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
+        viewIn?.isHidden = false
+        viewIn?.animateTransitionIn(backwards: backwards) { [weak self] in
+            self?.finalizeTransition()
+        }
+
+        viewOut?.isHidden = false
+        viewOut?.animateTransitionOut(backwards: backwards) { [weak self] in
+            self?.finalizeTransition(hiding: backwards ? nil : viewOut)
         }
     }
 

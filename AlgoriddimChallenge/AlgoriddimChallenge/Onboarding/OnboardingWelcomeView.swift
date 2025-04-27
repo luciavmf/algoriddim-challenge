@@ -80,7 +80,7 @@ final class OnboardingWelcomeView: UIView {
 
 extension OnboardingWelcomeView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
-
+        completion()
     }
 
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
