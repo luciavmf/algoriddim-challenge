@@ -210,37 +210,30 @@ final class OnboardingViewController: UIViewController {
             welcomeView.animateTransitionOut(backwards: true)
             heroView.animateTransitionIn(backwards: true) { [weak self] in
                 guard let self else { return }
-                self.heroView.isHidden = true
-                self.isAnimating = false
-                self.setInteraction(enabled: true)
+                self.finalizeTransition(hiding: self.heroView)
             }
             return
         }
 
         heroView.isHidden = true
-        selectLevelView.isHidden = true
-        isAnimating = false
-        setInteraction(enabled: true)
+        finalizeTransition(hiding: selectLevelView)
     }
 
     private func animateHeroView(animateBackwards: Bool) {
         if animateBackwards {
             heroView.isHidden = false
             heroView.animateTransitionOut(backwards: true)
-            setInteraction(enabled: true)
 
             selectLevelView.animateTransitionIn(backwards: true) { [weak self] in
-                self?.selectLevelView.isHidden = true
-                self?.isAnimating = false
+                guard let self else { return }
+                self.finalizeTransition(hiding: self.selectLevelView)
             }
             return
         }
 
         welcomeView.animateTransitionOut(completion: { [weak self] in
             guard let self else { return }
-            self.welcomeView.isHidden = true
-            self.setInteraction(enabled: true)
-            self.isAnimating = false
+            self.finalizeTransition(hiding: self.welcomeView)
         })
 
         heroView.isHidden = false
@@ -252,8 +245,7 @@ final class OnboardingViewController: UIViewController {
             selectLevelView.isHidden = false
             selectLevelView.animateTransitionOut(backwards: animateBackwards) { [weak self] in
                 guard let self else { return }
-                self.isAnimating = false
-                self.setInteraction(enabled: true)
+                self.finalizeTransition()
             }
             return
         }
@@ -267,18 +259,21 @@ final class OnboardingViewController: UIViewController {
 
         selectLevelView.animateTransitionIn { [weak self] in
             guard let self else { return }
-            self.isAnimating = false
-            self.setInteraction(enabled: true)
+            self.finalizeTransition()
         }
     }
 
     private func animateCustomView(animateBackwards: Bool) {
         selectLevelView.animateTransitionOut { [weak self] in
             guard let self else { return }
-            self.isAnimating = false
-            self.setInteraction(enabled: true)
-            self.selectLevelView.isHidden = true
+            self.finalizeTransition(hiding: self.selectLevelView)
         }
+    }
+
+    private func finalizeTransition(hiding view: UIView? = nil) {
+        view?.isHidden = true
+        isAnimating = false
+        setInteraction(enabled: true)
     }
 
     private func setInteraction(enabled: Bool) {
