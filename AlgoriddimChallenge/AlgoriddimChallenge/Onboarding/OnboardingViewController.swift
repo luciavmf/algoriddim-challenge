@@ -59,6 +59,7 @@ final class OnboardingViewController: UIViewController {
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
     private var selectLevelView = OnboardingSelectLevelView()
+    private var customView = OnboardingCustomView()
 
     // MARK: Other properties
 
@@ -79,6 +80,7 @@ final class OnboardingViewController: UIViewController {
         layoutSelectLevelView()
         layoutWelcomeView()
         layoutHeroView()
+        layoutView(customView)
 
         activateCurrentConstraints()
         animatePage(to: currentPageIndex)
@@ -147,6 +149,18 @@ final class OnboardingViewController: UIViewController {
             heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
             heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+        ])
+    }
+
+    private func layoutView(_ view: UIView) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(view)
+
+        NSLayoutConstraint.activate([
+            view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            view.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            view.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
 
