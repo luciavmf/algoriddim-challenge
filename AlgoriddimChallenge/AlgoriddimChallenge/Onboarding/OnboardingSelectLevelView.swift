@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol OnboardingSelectLevelViewDelegate: AnyObject {
+    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel)
+}
+
 final class OnboardingSelectLevelView: UIView {
     @MainActor
     private struct SelectLevelConstants {
@@ -43,23 +47,28 @@ final class OnboardingSelectLevelView: UIView {
 
     private var headerView: UIView = UIView()
 
-    private var firstOption: OnboardingCheckbox = {
+    private lazy var firstOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’m new to DJing"
+        checkbox.addTarget(self, action: #selector(selectNew), for: .touchUpInside)
         return checkbox
     }()
 
-    private var secondOption: OnboardingCheckbox = {
+    private lazy var secondOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’ve used DJ apps before"
+        checkbox.addTarget(self, action: #selector(selectAmmateur), for: .touchUpInside)
         return checkbox
     }()
 
-    private var thirdOption: OnboardingCheckbox = {
+    private lazy var thirdOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’m a professional DJ"
+        checkbox.addTarget(self, action: #selector(selectProffesional), for: .touchUpInside)
         return checkbox
     }()
+
+    weak var delegate: OnboardingSelectLevelViewDelegate?
 
     private lazy var optionsStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [firstOption, secondOption, thirdOption])
@@ -183,6 +192,25 @@ final class OnboardingSelectLevelView: UIView {
         }
     }
 
+    // MARK: Select options
+
+    @objc private func selectNew() {
+        secondOption.isSelected = false
+        thirdOption.isSelected = false
+        delegate?.onboardingSelectLevelView(self, didSelectLevel: .new)
+    }
+
+    @objc private func selectAmmateur() {
+        firstOption.isSelected = false
+        thirdOption.isSelected = false
+        delegate?.onboardingSelectLevelView(self, didSelectLevel: .ammateur)
+    }
+
+    @objc private func selectProffesional() {
+        firstOption.isSelected = false
+        secondOption.isSelected = false
+        delegate?.onboardingSelectLevelView(self, didSelectLevel: .professional)
+    }
 }
 
 // MARK: Animations

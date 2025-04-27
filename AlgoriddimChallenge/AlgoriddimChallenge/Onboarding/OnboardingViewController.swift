@@ -18,6 +18,16 @@ struct AnimatedConstraints {
     var animationOut: [NSLayoutConstraint] = []
 }
 
+enum SkillLevel: Sendable {
+    case new
+    case ammateur
+    case professional
+}
+
+final class OnboardingViewModel {
+    var selectedSkillLevel: SkillLevel?
+}
+
 final class OnboardingViewController: UIViewController {
     /// The onboarding pages.
     private enum OnboardingPage: Int, CaseIterable {
@@ -64,7 +74,13 @@ final class OnboardingViewController: UIViewController {
     private var sharedComponentsConstraints = Constraints()
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
-    private var selectLevelView = OnboardingSelectLevelView()
+
+    private lazy var selectLevelView: OnboardingSelectLevelView = {
+        let view = OnboardingSelectLevelView()
+        view.delegate = self
+        return view
+    }()
+
     private var customView = OnboardingCustomView()
 
     // MARK: Other properties
@@ -73,6 +89,8 @@ final class OnboardingViewController: UIViewController {
 
     // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
     private var isAnimating: Bool = false
+
+    private var viewModel = OnboardingViewModel()
 
     // MARK: UIViewController Life Cycle
 
@@ -213,7 +231,7 @@ final class OnboardingViewController: UIViewController {
         let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
 
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
-
+        onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
@@ -221,15 +239,16 @@ final class OnboardingViewController: UIViewController {
         let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
         let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
-
+        onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
     private func animateSelectLevelView(animateBackwards: Bool) {
         let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
         let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
 
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        onboardingButton.isEnabled = viewModel.selectedSkillLevel != nil
         onboardingButton.setTitle("Let's go", for: .normal)
     }
 
@@ -237,7 +256,7 @@ final class OnboardingViewController: UIViewController {
         let viewIn: TransitionAnimatableView? = !animateBackwards ? customView : nil
         let viewOut: TransitionAnimatableView? = !animateBackwards ? selectLevelView : nil
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
-
+        onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
     }
 
@@ -262,5 +281,20 @@ final class OnboardingViewController: UIViewController {
     private func setInteraction(enabled: Bool) {
         pageControl.isUserInteractionEnabled = enabled
         onboardingButton.isUserInteractionEnabled = enabled
+    }
+}
+
+extension OnboardingViewController: @preconcurrency OnboardingSelectLevelViewDelegate {
+    @MainActor
+    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel) {
+
+        if viewModel.selectedSkillLevel == level {
+            viewModel.selectedSkillLevel = nil
+            onboardingButton.isEnabled = false
+            return
+        }
+
+        viewModel.selectedSkillLevel = level
+        onboardingButton.isEnabled = true
     }
 }

@@ -7,8 +7,17 @@
 
 import UIKit
 
-final class OnboardingCheckbox: UIView {
-    var isSelected: Bool = false
+final class OnboardingCheckbox: UIControl {
+
+    override var isSelected: Bool {
+        get {
+            super.isSelected
+        }
+        set {
+            super.isSelected = newValue
+            updateAppearance()
+        }
+    }
 
     var text: String? {
         get {
@@ -55,25 +64,18 @@ final class OnboardingCheckbox: UIView {
         super.init(frame: frame)
 
         layoutView()
-        setupGesture()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
         layoutView()
-        setupGesture()
     }
 
-    private func setupGesture() {
-        isUserInteractionEnabled = true
-        let tap = UITapGestureRecognizer(target: self, action: #selector(didTapView))
-        addGestureRecognizer(tap)
-    }
-
-    @objc private func didTapView() {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
         isSelected.toggle()
-        updateAppearance()
+        sendActions(for: .touchUpInside)
     }
 
     private func updateAppearance() {
