@@ -225,7 +225,13 @@ final class OnboardingViewController: UIViewController {
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
         switch gesture.direction {
         case .left:
-            continueToNextScreen()
+            if viewModel.currentPage == .selectLevel {
+                if viewModel.selectedSkillLevel != nil {
+                    continueToNextScreen()
+                }
+            } else {
+                continueToNextScreen()
+            }
 
         case .right:
             continueToPreviousScreen()
