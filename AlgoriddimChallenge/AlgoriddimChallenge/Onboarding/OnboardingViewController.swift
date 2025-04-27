@@ -50,6 +50,12 @@ final class OnboardingViewController: UIViewController {
         pageControl.currentPageIndicatorTintColor = .white
         pageControl.pageIndicatorTintColor = .pageIndicatorTint
         pageControl.addTarget(self, action: #selector(pageChanged), for: .valueChanged)
+
+        // Disable the long press gestures
+        pageControl.gestureRecognizers?
+            .compactMap { $0 as? UILongPressGestureRecognizer }
+            .forEach { $0.isEnabled = false }
+
         return pageControl
     }()
 
