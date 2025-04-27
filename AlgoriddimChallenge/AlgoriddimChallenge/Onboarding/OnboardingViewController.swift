@@ -18,14 +18,28 @@ struct AnimatedConstraints {
     var animationOut: [NSLayoutConstraint] = []
 }
 
+enum SkillLevel: Sendable {
+    case new
+    case ammateur
+    case professional
+}
+
+/// The onboarding pages.
+enum OnboardingPage: Int, CaseIterable {
+    case welcome
+    case hero
+    case selectLevel
+    case custom
+}
+
+/// The properties of the OnboardingViewController.
+final class OnboardingViewModel {
+    var currentPage: OnboardingPage = .welcome
+    var selectedSkillLevel: SkillLevel?
+}
+
+/// The Onboarding component.
 final class OnboardingViewController: UIViewController {
-    /// The onboarding pages.
-    private enum OnboardingPage: Int, CaseIterable {
-        case welcome
-        case hero
-        case selectLevel
-        case custom
-    }
 
     /// The sizes that are used only for the shared components.
     private struct SharedComponentSizes {
@@ -64,15 +78,19 @@ final class OnboardingViewController: UIViewController {
     private var sharedComponentsConstraints = Constraints()
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
-    private var selectLevelView = OnboardingSelectLevelView()
+
+    private lazy var selectLevelView: OnboardingSelectLevelView = {
+        let view = OnboardingSelectLevelView()
+        view.delegate = self
+        return view
+    }()
+
     private var customView = OnboardingCustomView()
-
-    // MARK: Other properties
-
-    private var currentPageIndex: Int = 0
 
     // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
     private var isAnimating: Bool = false
+
+    private var viewModel = OnboardingViewModel()
 
     // MARK: UIViewController Life Cycle
 
@@ -89,7 +107,21 @@ final class OnboardingViewController: UIViewController {
 
         activateCurrentConstraints()
 
-        animatePage(to: currentPageIndex)
+        animatePage(to: viewModel.currentPage.rawValue)
+
+        setupSwipeGestures()
+    }
+
+    // MARK: Setup
+
+    private func setupSwipeGestures() {
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeLeft.direction = .left
+        view.addGestureRecognizer(swipeLeft)
+
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
     }
 
     // MARK: Layout
@@ -177,9 +209,33 @@ final class OnboardingViewController: UIViewController {
         animatePage(to: pageControl.currentPage)
     }
 
+    @objc private func continueToPreviousScreen() {
+        guard pageControl.currentPage > 0, !isAnimating else {
+            return
+        }
+
+        pageControl.currentPage -= 1
+        animatePage(to: pageControl.currentPage)
+    }
+
     @objc private func pageChanged(_ sender: UIPageControl) {
         animatePage(to: sender.currentPage)
     }
+
+    @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        switch gesture.direction {
+        case .left:
+            continueToNextScreen()
+
+        case .right:
+            continueToPreviousScreen()
+
+        default:
+            break
+        }
+    }
+
+    // MARK: Presentation
 
     private func animatePage(to page: Int) {
         // Prevent having overlapping animations.
@@ -188,12 +244,10 @@ final class OnboardingViewController: UIViewController {
         isAnimating = true
         setInteraction(enabled: false)
 
-        let animateBackwards = page < currentPageIndex
-        currentPageIndex = page
+        let animateBackwards = page < viewModel.currentPage.rawValue
+        viewModel.currentPage = OnboardingPage(rawValue: page) ?? .welcome
 
-        let currentPage = OnboardingPage(rawValue: page) ?? .welcome
-
-        switch currentPage {
+        switch viewModel.currentPage {
         case .welcome:
             animateWelcomeView(animateBackwards: animateBackwards)
 
@@ -213,25 +267,33 @@ final class OnboardingViewController: UIViewController {
         let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
 
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        onboardingButton.isEnabled = true
+        onboardingButton.setTitle("Continue", for: .normal)
     }
 
     private func animateHeroView(animateBackwards: Bool) {
         let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
         let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        onboardingButton.isEnabled = true
+        onboardingButton.setTitle("Continue", for: .normal)
     }
 
     private func animateSelectLevelView(animateBackwards: Bool) {
         let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
         let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        onboardingButton.isEnabled = viewModel.selectedSkillLevel != nil
+        onboardingButton.setTitle("Let's go", for: .normal)
     }
 
     private func animateCustomView(animateBackwards: Bool) {
-        selectLevelView.animateTransitionOut { [weak self] in
-            guard let self else { return }
-            self.finalizeTransition(hiding: self.selectLevelView)
-        }
+        let viewIn: TransitionAnimatableView? = !animateBackwards ? customView : nil
+        let viewOut: TransitionAnimatableView? = !animateBackwards ? selectLevelView : nil
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        onboardingButton.isEnabled = true
+        onboardingButton.setTitle("Done", for: .normal)
     }
 
     private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
@@ -255,5 +317,20 @@ final class OnboardingViewController: UIViewController {
     private func setInteraction(enabled: Bool) {
         pageControl.isUserInteractionEnabled = enabled
         onboardingButton.isUserInteractionEnabled = enabled
+    }
+}
+
+extension OnboardingViewController: @preconcurrency OnboardingSelectLevelViewDelegate {
+    @MainActor
+    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel) {
+
+        if viewModel.selectedSkillLevel == level {
+            viewModel.selectedSkillLevel = nil
+            onboardingButton.isEnabled = false
+            return
+        }
+
+        viewModel.selectedSkillLevel = level
+        onboardingButton.isEnabled = true
     }
 }

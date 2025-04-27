@@ -9,6 +9,16 @@ import UIKit
 
 /// A button styled as the onbarding button. It has a press down state for the view.
 final class OnboardingButton: UIButton {
+
+    override var isEnabled: Bool {
+        didSet {
+            UIView.animate(withDuration: AnimationDuration.fast) { [weak self] in
+                guard let self else { return }
+                self.alpha = self.isEnabled ? 1 : 0.5
+            }
+        }
+    }
+
     // MARK: Initializers
 
     init(title: String, target: Any?, action: Selector) {
@@ -48,7 +58,7 @@ final class OnboardingButton: UIButton {
 
     @objc private func releaseUp() {
         UIView.animate(withDuration: AnimationDuration.fast) { [weak self] in
-            self?.alpha = 1.0
+            self?.alpha = self?.isEnabled == true ? 1 : 0.5
         }
     }
 }
