@@ -74,7 +74,14 @@ final class OnboardingWelcomeView: UIView {
         NSLayoutConstraint.activate(dinamycConstraints.animationIn)
     }
 
-    // MARK: Animation
+}
+
+// MARK: Animations
+
+extension OnboardingWelcomeView: TransitionAnimatable {
+    func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
+
+    }
 
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         logoView.isHidden = true
@@ -93,7 +100,7 @@ final class OnboardingWelcomeView: UIView {
             animations: { [weak self] in
                 self?.layoutIfNeeded()
             },
-            completion: {  [weak self] _ in
+            completion: { [weak self] _ in
                 self?.logoView.isHidden = false
                 completion()
             }

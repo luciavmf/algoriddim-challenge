@@ -183,6 +183,11 @@ final class OnboardingSelectLevelView: UIView {
         }
     }
 
+}
+
+// MARK: Animations
+
+extension OnboardingSelectLevelView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
     }
