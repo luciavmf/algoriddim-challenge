@@ -74,15 +74,15 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
-
         layoutSharedComponents()
 
-        layoutSelectLevelView()
-        layoutWelcomeView()
-        layoutHeroView()
+        layoutView(welcomeView)
+        layoutView(heroView)
+        layoutView(selectLevelView)
         layoutView(customView)
 
         activateCurrentConstraints()
+
         animatePage(to: currentPageIndex)
     }
 
@@ -128,30 +128,6 @@ final class OnboardingViewController: UIViewController {
         ]
     }
 
-    private func layoutWelcomeView() {
-        welcomeView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(welcomeView)
-
-        NSLayoutConstraint.activate([
-            welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-
-    private func layoutHeroView() {
-        heroView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(heroView)
-
-        NSLayoutConstraint.activate([
-            heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-
     private func layoutView(_ view: UIView) {
         view.translatesAutoresizingMaskIntoConstraints = false
         self.view.addSubview(view)
@@ -162,18 +138,8 @@ final class OnboardingViewController: UIViewController {
             view.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
             view.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor)
         ])
-    }
 
-    private func layoutSelectLevelView() {
-        selectLevelView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(selectLevelView)
-
-        NSLayoutConstraint.activate([
-            selectLevelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            selectLevelView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            selectLevelView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
-            selectLevelView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal)
-        ])
+        view.isHidden = true
     }
 
     // MARK: Landscape - Portrait
