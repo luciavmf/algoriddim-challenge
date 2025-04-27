@@ -151,7 +151,9 @@ final class OnboardingHeroView: UIView {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-        activateCurrentConstraints()
+        if previousTraitCollection?.layoutDirection != traitCollection.layoutDirection {
+            activateCurrentConstraints()
+        }
     }
 
     private func deactivateConstraints() {
