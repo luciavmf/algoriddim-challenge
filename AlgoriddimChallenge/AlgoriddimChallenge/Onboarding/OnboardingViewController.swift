@@ -50,6 +50,12 @@ final class OnboardingViewController: UIViewController {
         pageControl.currentPageIndicatorTintColor = .white
         pageControl.pageIndicatorTintColor = .pageIndicatorTint
         pageControl.addTarget(self, action: #selector(pageChanged), for: .valueChanged)
+
+        // Disable the long press gestures
+        pageControl.gestureRecognizers?
+            .compactMap { $0 as? UILongPressGestureRecognizer }
+            .forEach { $0.isEnabled = false }
+
         return pageControl
     }()
 
@@ -59,6 +65,7 @@ final class OnboardingViewController: UIViewController {
     private var welcomeView = OnboardingWelcomeView()
     private var heroView = OnboardingHeroView()
     private var selectLevelView = OnboardingSelectLevelView()
+    private var customView = OnboardingCustomView()
 
     // MARK: Other properties
 
@@ -73,14 +80,15 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
-
         layoutSharedComponents()
 
-        layoutSelectLevelView()
-        layoutWelcomeView()
-        layoutHeroView()
+        layoutView(welcomeView)
+        layoutView(heroView)
+        layoutView(selectLevelView)
+        layoutView(customView)
 
         activateCurrentConstraints()
+
         animatePage(to: currentPageIndex)
     }
 
@@ -126,40 +134,18 @@ final class OnboardingViewController: UIViewController {
         ]
     }
 
-    private func layoutWelcomeView() {
-        welcomeView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(welcomeView)
+    private func layoutView(_ view: UIView) {
+        view.translatesAutoresizingMaskIntoConstraints = false
+        self.view.addSubview(view)
 
         NSLayoutConstraint.activate([
-            welcomeView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            welcomeView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            welcomeView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            welcomeView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
+            view.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            view.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor),
+            view.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            view.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor)
         ])
-    }
 
-    private func layoutHeroView() {
-        heroView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(heroView)
-
-        NSLayoutConstraint.activate([
-            heroView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            heroView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            heroView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            heroView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
-        ])
-    }
-
-    private func layoutSelectLevelView() {
-        selectLevelView.translatesAutoresizingMaskIntoConstraints = false
-        view.addSubview(selectLevelView)
-
-        NSLayoutConstraint.activate([
-            selectLevelView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            selectLevelView.bottomAnchor.constraint(equalTo: onboardingButton.topAnchor, constant: -Paddings.half),
-            selectLevelView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
-            selectLevelView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal)
-        ])
+        view.isHidden = true
     }
 
     // MARK: Landscape - Portrait
@@ -223,82 +209,47 @@ final class OnboardingViewController: UIViewController {
     }
 
     private func animateWelcomeView(animateBackwards: Bool) {
-        welcomeView.isHidden = false
+        let viewIn: TransitionAnimatableView? = !animateBackwards ? welcomeView : heroView
+        let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
 
-        if animateBackwards {
-            // Animate the view backwards when the previous page is the hero page.
-            welcomeView.animateTransitionOut(backwards: true)
-            heroView.animateTransitionIn(backwards: true) { [weak self] in
-                guard let self else { return }
-                self.heroView.isHidden = true
-                self.isAnimating = false
-                self.setInteraction(enabled: true)
-            }
-            return
-        }
-
-        heroView.isHidden = true
-        selectLevelView.isHidden = true
-        isAnimating = false
-        setInteraction(enabled: true)
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateHeroView(animateBackwards: Bool) {
-        if animateBackwards {
-            heroView.isHidden = false
-            heroView.animateTransitionOut(backwards: true)
-            setInteraction(enabled: true)
-
-            selectLevelView.animateTransitionIn(backwards: true) { [weak self] in
-                self?.selectLevelView.isHidden = true
-                self?.isAnimating = false
-            }
-            return
-        }
-
-        welcomeView.animateTransitionOut(completion: { [weak self] in
-            guard let self else { return }
-            self.welcomeView.isHidden = true
-            self.setInteraction(enabled: true)
-            self.isAnimating = false
-        })
-
-        heroView.isHidden = false
-        heroView.animateTransitionIn()
+        let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+        let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateSelectLevelView(animateBackwards: Bool) {
-        if animateBackwards {
-            selectLevelView.isHidden = false
-            selectLevelView.animateTransitionOut(backwards: animateBackwards) { [weak self] in
-                guard let self else { return }
-                self.isAnimating = false
-                self.setInteraction(enabled: true)
-            }
-            return
-        }
-
-        heroView.animateTransitionOut { [weak self] in
-            guard let self else { return }
-            self.heroView.isHidden = true
-        }
-
-        selectLevelView.isHidden = false
-
-        selectLevelView.animateTransitionIn { [weak self] in
-            guard let self else { return }
-            self.isAnimating = false
-            self.setInteraction(enabled: true)
-        }
+        let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
+        let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
     }
 
     private func animateCustomView(animateBackwards: Bool) {
         selectLevelView.animateTransitionOut { [weak self] in
             guard let self else { return }
-            self.isAnimating = false
-            self.setInteraction(enabled: true)
-            self.selectLevelView.isHidden = true
+            self.finalizeTransition(hiding: self.selectLevelView)
         }
+    }
+
+    private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
+        viewIn?.isHidden = false
+        viewIn?.animateTransitionIn(backwards: backwards) { [weak self] in
+            self?.finalizeTransition()
+        }
+
+        viewOut?.isHidden = false
+        viewOut?.animateTransitionOut(backwards: backwards) { [weak self] in
+            self?.finalizeTransition(hiding: backwards ? nil : viewOut)
+        }
+    }
+
+    private func finalizeTransition(hiding view: UIView? = nil) {
+        view?.isHidden = true
+        isAnimating = false
+        setInteraction(enabled: true)
     }
 
     private func setInteraction(enabled: Bool) {

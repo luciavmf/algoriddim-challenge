@@ -150,8 +150,8 @@ final class OnboardingSelectLevelView: UIView {
 
         stackConstraints.portrait = [
             optionsStackView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor),
-            optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor)
+            optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+            optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal)
         ]
 
         stackConstraints.landscape = [
@@ -183,6 +183,11 @@ final class OnboardingSelectLevelView: UIView {
         }
     }
 
+}
+
+// MARK: Animations
+
+extension OnboardingSelectLevelView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
     }

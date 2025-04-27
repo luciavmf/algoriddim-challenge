@@ -184,8 +184,11 @@ final class OnboardingHeroView: UIView {
         }
     }
 
-    // MARK: Animations
+}
 
+// MARK: Animations
+
+extension OnboardingHeroView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         animateLogo(backwards: backwards, completion: completion)
 
