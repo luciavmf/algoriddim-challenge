@@ -108,6 +108,20 @@ final class OnboardingViewController: UIViewController {
         activateCurrentConstraints()
 
         animatePage(to: viewModel.currentPage.rawValue)
+
+        setupSwipeGestures()
+    }
+
+    // MARK: Setup
+
+    private func setupSwipeGestures() {
+        let swipeLeft = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeLeft.direction = .left
+        view.addGestureRecognizer(swipeLeft)
+
+        let swipeRight = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeRight.direction = .right
+        view.addGestureRecognizer(swipeRight)
     }
 
     // MARK: Layout
@@ -195,9 +209,33 @@ final class OnboardingViewController: UIViewController {
         animatePage(to: pageControl.currentPage)
     }
 
+    @objc private func continueToPreviousScreen() {
+        guard pageControl.currentPage > 0, !isAnimating else {
+            return
+        }
+
+        pageControl.currentPage -= 1
+        animatePage(to: pageControl.currentPage)
+    }
+
     @objc private func pageChanged(_ sender: UIPageControl) {
         animatePage(to: sender.currentPage)
     }
+
+    @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        switch gesture.direction {
+        case .left:
+            continueToNextScreen()
+
+        case .right:
+            continueToPreviousScreen()
+
+        default:
+            break
+        }
+    }
+
+    // MARK: Presentation
 
     private func animatePage(to page: Int) {
         // Prevent having overlapping animations.
