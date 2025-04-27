@@ -8,7 +8,7 @@
 import UIKit
 
 final class OnboardingWelcomeView: UIView {
-    private var dinamycConstraints = AnimatedConstraints()
+    private var dynamicConstraints = AnimatedConstraints()
     public var isAnimating: Bool = false
 
     private var logoView: UIImageView = {
@@ -33,14 +33,12 @@ final class OnboardingWelcomeView: UIView {
         super.init(frame: frame)
 
         layoutWelcomePage()
-        activateConstraints()
     }
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
 
         layoutWelcomePage()
-        activateConstraints()
     }
 
     // MARK: Layout
@@ -53,7 +51,7 @@ final class OnboardingWelcomeView: UIView {
         welcomeLabel.translatesAutoresizingMaskIntoConstraints = false
         addSubview(welcomeLabel)
 
-        dinamycConstraints.animationIn = [
+        dynamicConstraints.animationIn = [
             logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
             logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
@@ -61,19 +59,16 @@ final class OnboardingWelcomeView: UIView {
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.third)
         ]
 
-        dinamycConstraints.animationOut = [
+        dynamicConstraints.animationOut = [
             logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
             logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.third + 44)
         ]
-    }
 
-    private func activateConstraints() {
-        NSLayoutConstraint.activate(dinamycConstraints.animationIn)
+        NSLayoutConstraint.activate(dynamicConstraints.animationIn)
     }
-
 }
 
 // MARK: Animations
@@ -86,11 +81,11 @@ extension OnboardingWelcomeView: TransitionAnimatable {
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         logoView.isHidden = true
         if backwards {
-            NSLayoutConstraint.deactivate(dinamycConstraints.animationOut)
-            NSLayoutConstraint.activate(dinamycConstraints.animationIn)
+            NSLayoutConstraint.deactivate(dynamicConstraints.animationOut)
+            NSLayoutConstraint.activate(dynamicConstraints.animationIn)
         } else {
-            NSLayoutConstraint.deactivate(dinamycConstraints.animationIn)
-            NSLayoutConstraint.activate(dinamycConstraints.animationOut)
+            NSLayoutConstraint.deactivate(dynamicConstraints.animationIn)
+            NSLayoutConstraint.activate(dynamicConstraints.animationOut)
         }
 
         UIView.animate(
