@@ -33,13 +33,20 @@ final class OnboardingCustomView: UIView {
         return label
     }()
 
+    private var iconView: UIImageView  = {
+        let uiimageView = UIImageView()
+        uiimageView.contentMode = .center
+        uiimageView.image = UIImage(named: "Icon")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
+        return uiimageView
+    }()
+
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        let stackView = UIStackView(arrangedSubviews: [iconView, titleLabel, subtitleLabel])
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.spacing = Paddings.normal
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        [titleLabel, subtitleLabel].forEach { option in
+        [iconView, titleLabel, subtitleLabel].forEach { option in
             option.translatesAutoresizingMaskIntoConstraints = false
         }
         return stackView
