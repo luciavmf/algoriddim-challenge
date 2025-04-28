@@ -52,17 +52,17 @@ final class OnboardingWelcomeView: UIView {
         addSubview(welcomeLabel)
 
         dynamicConstraints.animationIn = [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.third)
         ]
 
         dynamicConstraints.animationOut = [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.third + 44)
         ]

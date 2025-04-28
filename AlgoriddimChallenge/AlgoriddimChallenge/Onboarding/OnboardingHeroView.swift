@@ -8,8 +8,9 @@
 import UIKit
 
 @MainActor
-struct LogoSize {
-    static var height: CGFloat = DeviceScreenSize.width <= 375 ? 44 : 64
+struct CustomImageSize {
+    static var logoHeight: CGFloat = DeviceScreenSize.width <= 375 ? 44 : 64
+    static var heroHeight: CGFloat = DeviceScreenSize.width <= 375 ? 100 : 140
 }
 
 final class OnboardingHeroView: UIView {
@@ -57,8 +58,10 @@ final class OnboardingHeroView: UIView {
         return uiimageView
     }()
 
+    /// A view that holds the title and the apple design award view.
     private lazy var containerView = UIView()
 
+    /// The constraints of the view in landscape and portrait mode.
     private var dynamicConstraints = Constraints()
 
     private var logoInitialConstraint = Constraints()
@@ -96,7 +99,7 @@ final class OnboardingHeroView: UIView {
         addSubview(logoView)
 
         logoInitialConstraint.portrait = [
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -106,7 +109,7 @@ final class OnboardingHeroView: UIView {
         ]
 
         logoInitialConstraint.landscape = [
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -130,8 +133,8 @@ final class OnboardingHeroView: UIView {
 
     private func makePortraitConstraints() -> [NSLayoutConstraint] {
         [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
-
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
+            heroView.heightAnchor.constraint(equalToConstant: CustomImageSize.heroHeight),
             heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             heroView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
             heroView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -Paddings.normal),
@@ -153,7 +156,7 @@ final class OnboardingHeroView: UIView {
 
     private func makeLandscapeConstraints() -> [NSLayoutConstraint] {
         [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
 
             heroView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             heroView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
