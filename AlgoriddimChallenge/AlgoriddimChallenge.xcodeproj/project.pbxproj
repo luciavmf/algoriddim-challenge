@@ -24,7 +24,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		84A6399F2DBA53A900567870 /* AlgoriddimChallenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AlgoriddimChallenge.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		84A6399F2DBA53A900567870 /* djay Challenge.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "djay Challenge.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A639B52DBA53AA00567870 /* AlgoriddimChallengeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlgoriddimChallengeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		84A639BF2DBA53AA00567870 /* AlgoriddimChallengeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AlgoriddimChallengeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -98,7 +98,7 @@
 		84A639A02DBA53A900567870 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				84A6399F2DBA53A900567870 /* AlgoriddimChallenge.app */,
+				84A6399F2DBA53A900567870 /* djay Challenge.app */,
 				84A639B52DBA53AA00567870 /* AlgoriddimChallengeTests.xctest */,
 				84A639BF2DBA53AA00567870 /* AlgoriddimChallengeUITests.xctest */,
 			);
@@ -128,7 +128,7 @@
 			packageProductDependencies = (
 			);
 			productName = AlgoriddimChallenge;
-			productReference = 84A6399F2DBA53A900567870 /* AlgoriddimChallenge.app */;
+			productReference = 84A6399F2DBA53A900567870 /* djay Challenge.app */;
 			productType = "com.apple.product-type.application";
 		};
 		84A639B42DBA53AA00567870 /* AlgoriddimChallengeTests */ = {
@@ -329,7 +329,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luciavmf.AlgoriddimChallenge;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "djay Challenge";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -361,7 +361,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.luciavmf.AlgoriddimChallenge;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = "djay Challenge";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
