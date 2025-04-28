@@ -52,17 +52,17 @@ final class OnboardingWelcomeView: UIView {
         addSubview(welcomeLabel)
 
         dynamicConstraints.animationIn = [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.third)
         ]
 
         dynamicConstraints.animationOut = [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             welcomeLabel.centerXAnchor.constraint(equalTo: centerXAnchor),
             welcomeLabel.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.third + 44)
         ]
@@ -75,6 +75,9 @@ final class OnboardingWelcomeView: UIView {
 
 extension OnboardingWelcomeView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
+        if backwards {
+            logoView.isHidden = true
+        }
         completion()
     }
 
@@ -96,8 +99,10 @@ extension OnboardingWelcomeView: TransitionAnimatable {
                 self?.layoutIfNeeded()
             },
             completion: { [weak self] _ in
-                self?.logoView.isHidden = false
                 completion()
+                if backwards {
+                    self?.logoView.isHidden = false
+                }
             }
         )
     }

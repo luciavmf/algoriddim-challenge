@@ -107,7 +107,7 @@ final class OnboardingViewController: UIViewController {
 
         activateCurrentConstraints()
 
-        animatePage(to: viewModel.currentPage.rawValue)
+        presentPage(pageIndex: viewModel.currentPage.rawValue)
 
         setupSwipeGestures()
     }
@@ -201,25 +201,25 @@ final class OnboardingViewController: UIViewController {
     // MARK: UI Actions
 
     @objc private func continueToNextScreen() {
-        guard pageControl.currentPage < OnboardingPage.allCases.count - 1, !isAnimating else {
+        guard !isAnimating, pageControl.currentPage < OnboardingPage.allCases.count - 1 else {
             return
         }
 
         pageControl.currentPage += 1
-        animatePage(to: pageControl.currentPage)
+        presentPage(pageIndex: pageControl.currentPage)
     }
 
     @objc private func continueToPreviousScreen() {
-        guard pageControl.currentPage > 0, !isAnimating else {
+        guard !isAnimating, pageControl.currentPage > 0 else {
             return
         }
 
         pageControl.currentPage -= 1
-        animatePage(to: pageControl.currentPage)
+        presentPage(pageIndex: pageControl.currentPage)
     }
 
     @objc private func pageChanged(_ sender: UIPageControl) {
-        animatePage(to: sender.currentPage)
+        presentPage(pageIndex: sender.currentPage)
     }
 
     @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
@@ -243,80 +243,97 @@ final class OnboardingViewController: UIViewController {
 
     // MARK: Presentation
 
-    private func animatePage(to page: Int) {
+    private func presentPage(pageIndex: Int) {
         // Prevent having overlapping animations.
         guard !isAnimating else { return }
 
         isAnimating = true
         setInteraction(enabled: false)
 
-        let animateBackwards = page < viewModel.currentPage.rawValue
-        viewModel.currentPage = OnboardingPage(rawValue: page) ?? .welcome
+        let isPresenting = viewModel.currentPage.rawValue < pageIndex
+        viewModel.currentPage = OnboardingPage(rawValue: pageIndex) ?? .welcome
 
         switch viewModel.currentPage {
         case .welcome:
-            animateWelcomeView(animateBackwards: animateBackwards)
+            presentWelcomeView(transitionIn: isPresenting)
 
         case .hero:
-            animateHeroView(animateBackwards: animateBackwards)
+            presentHeroView(trantitionIn: isPresenting)
 
         case .selectLevel:
-            animateSelectLevelView(animateBackwards: animateBackwards)
+            presentSelectLevelView(transitionIn: isPresenting)
 
         case .custom:
-            animateCustomView(animateBackwards: animateBackwards)
+            presentCustomView(transitionIn: isPresenting)
         }
     }
 
-    private func animateWelcomeView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView? = !animateBackwards ? welcomeView : heroView
-        let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
+    private func presentWelcomeView(transitionIn: Bool) {
+        let viewIn: TransitionAnimatableView? = transitionIn ? welcomeView : heroView
+        let viewOut: TransitionAnimatableView? = transitionIn ? nil : welcomeView
 
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
-    private func animateHeroView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
-        let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+    private func presentHeroView(trantitionIn: Bool) {
+        let viewIn: TransitionAnimatableView = trantitionIn ? heroView : selectLevelView
+        let viewOut: TransitionAnimatableView = trantitionIn ? welcomeView : heroView
+        animate(viewIn: viewIn, viewOut: viewOut, transitionIn: trantitionIn)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
-    private func animateSelectLevelView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
-        let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+    private func presentSelectLevelView(transitionIn: Bool) {
+        let viewIn: TransitionAnimatableView = transitionIn ? selectLevelView : customView
+        let viewOut: TransitionAnimatableView = transitionIn ? heroView : selectLevelView
 
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
         onboardingButton.isEnabled = viewModel.selectedSkillLevel != nil
         onboardingButton.setTitle("Let's go", for: .normal)
     }
 
-    private func animateCustomView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView? = !animateBackwards ? customView : nil
-        let viewOut: TransitionAnimatableView? = !animateBackwards ? selectLevelView : nil
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+    private func presentCustomView(transitionIn: Bool) {
+        let viewIn: TransitionAnimatableView? = transitionIn ? customView : nil
+        let viewOut: TransitionAnimatableView? = transitionIn ? selectLevelView : nil
+        animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
         customView.selectedSkillLevel = viewModel.selectedSkillLevel
     }
 
-    private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
-        viewIn?.isHidden = false
-        viewIn?.animateTransitionIn(backwards: backwards) { [weak self] in
-            self?.finalizeTransition()
+    private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, transitionIn: Bool) {
+        let group = DispatchGroup()
+
+        if let viewIn {
+            viewIn.isHidden = false
+            group.enter()
+            viewIn.animateTransitionIn(backwards: !transitionIn) {
+                group.leave()
+            }
         }
 
-        viewOut?.isHidden = false
-        viewOut?.animateTransitionOut(backwards: backwards) { [weak self] in
-            self?.finalizeTransition(hiding: backwards ? nil : viewOut)
+        if let viewOut {
+            viewOut.isHidden = false
+            group.enter()
+            viewOut.animateTransitionOut(backwards: !transitionIn) {
+                group.leave()
+            }
+        }
+
+        group.notify(queue: .main) { [weak self] in
+            self?.finalizeTransition()
+
+            if transitionIn {
+                viewOut?.isHidden = true
+            } else {
+                viewIn?.isHidden = true
+            }
         }
     }
 
-    private func finalizeTransition(hiding view: UIView? = nil) {
-        view?.isHidden = true
+    private func finalizeTransition() {
         isAnimating = false
         setInteraction(enabled: true)
     }

@@ -23,7 +23,7 @@ struct Paddings {
     }
 
     static var checkbox: CGFloat {
-        DeviceScreenSize.width <= 375 ? 6 : 12
+        DeviceScreenSize.width <= 375 ? 10 : 12
     }
 }
 

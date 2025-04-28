@@ -8,8 +8,9 @@
 import UIKit
 
 @MainActor
-struct LogoSize {
-    static var height: CGFloat = DeviceScreenSize.width <= 375 ? 44 : 64
+struct CustomImageSize {
+    static var logoHeight: CGFloat = DeviceScreenSize.width <= 375 ? 44 : 64
+    static var heroHeight: CGFloat = DeviceScreenSize.width <= 375 ? 100 : 140
 }
 
 final class OnboardingHeroView: UIView {
@@ -57,8 +58,10 @@ final class OnboardingHeroView: UIView {
         return uiimageView
     }()
 
+    /// A view that holds the title and the apple design award view.
     private lazy var containerView = UIView()
 
+    /// The constraints of the view in landscape and portrait mode.
     private var dynamicConstraints = Constraints()
 
     private var logoInitialConstraint = Constraints()
@@ -96,7 +99,7 @@ final class OnboardingHeroView: UIView {
         addSubview(logoView)
 
         logoInitialConstraint.portrait = [
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -106,7 +109,7 @@ final class OnboardingHeroView: UIView {
         ]
 
         logoInitialConstraint.landscape = [
-            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.1),
+            logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -130,8 +133,8 @@ final class OnboardingHeroView: UIView {
 
     private func makePortraitConstraints() -> [NSLayoutConstraint] {
         [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
-
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
+            heroView.heightAnchor.constraint(equalToConstant: CustomImageSize.heroHeight),
             heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             heroView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
             heroView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -Paddings.normal),
@@ -153,7 +156,7 @@ final class OnboardingHeroView: UIView {
 
     private func makeLandscapeConstraints() -> [NSLayoutConstraint] {
         [
-            logoView.heightAnchor.constraint(equalToConstant: LogoSize.height),
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
 
             heroView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
             heroView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
@@ -209,35 +212,45 @@ final class OnboardingHeroView: UIView {
 
 extension OnboardingHeroView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
-        animateLogo(backwards: backwards, completion: completion)
+        animateLogo(backwards: backwards)
+
+        let forwards = !backwards
+
+        heroView.alpha = forwards ? 0 : 1
+        heroView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
+        containerView.alpha = forwards ? 0 : 1
+        containerView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
 
         UIView.animate(
             withDuration: AnimationDuration.slow,
             delay: 0,
             usingSpringWithDamping: 0.7,
             initialSpringVelocity: 0.8,
-            options: [.curveEaseInOut]
-        ) { [weak self] in
-            guard let self else { return }
-            if backwards {
-                self.containerView.alpha = 0
-                self.containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-                heroView.alpha = 0
-                heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-            } else {
-                heroView.alpha = 1
-                heroView.transform = .identity
-                self.containerView.alpha = 1
-                self.containerView.transform = .identity
-            }
-        }
+            options: [.curveEaseInOut],
+            animations: { [weak self] in
+                guard let self else { return }
+                if backwards {
+                    self.containerView.alpha = 0
+                    self.containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                    heroView.alpha = 0
+                    heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                } else {
+                    heroView.alpha = 1
+                    heroView.transform = .identity
+                    self.containerView.alpha = 1
+                    self.containerView.transform = .identity
+                }
+            },
+            completion: { _ in
+                completion()
+            })
     }
 
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         slideAnimate(direction: .middleToLeft, backwards: backwards, completion: completion)
     }
 
-    private func animateLogo(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+    private func animateLogo(backwards: Bool = false) {
         deactivateConstraints()
 
         if traitCollection.verticalSizeClass == .regular {
@@ -255,23 +268,9 @@ extension OnboardingHeroView: TransitionAnimatable {
             initialSpringVelocity: 0.5,
             options: [.curveEaseInOut],
             animations: { [weak self] in
-            // Animate the layout of the logo
-            self?.layoutIfNeeded()
-            }, completion: { _ in
-                completion()
+                // Animate the layout of the logo
+                self?.layoutIfNeeded()
             }
         )
-
-        if backwards {
-            heroView.alpha = 1
-            heroView.transform = .identity
-            containerView.alpha = 1
-            containerView.transform = .identity
-        } else {
-            heroView.alpha = 0
-            heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-            containerView.alpha = 0
-            containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-        }
     }
 }
