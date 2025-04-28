@@ -15,7 +15,7 @@ final class OnboardingSelectLevelView: UIView {
     @MainActor
     private struct SelectLevelConstants {
         static let normal: CGFloat = DeviceScreenSize.width <= 375 ? 20 : 40
-        static let iconSize: CGFloat = 80
+        static let iconSize: CGFloat =  DeviceScreenSize.width <= 375 ? 50 : 80
     }
 
     private var iconView: UIImageView  = {
@@ -45,11 +45,20 @@ final class OnboardingSelectLevelView: UIView {
         return label
     }()
 
-    private var headerView: UIView = UIView()
+    private var headerView: UIView = {
+        let view: UIView = .init()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+
+    // Spacers views used to center the whole view
+    private let topSpacer = UIView()
+    private let bottomSpacer = UIView()
 
     private lazy var firstOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’m new to DJing"
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
         checkbox.addTarget(self, action: #selector(selectNew), for: .touchUpInside)
         return checkbox
     }()
@@ -57,6 +66,7 @@ final class OnboardingSelectLevelView: UIView {
     private lazy var secondOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’ve used DJ apps before"
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
         checkbox.addTarget(self, action: #selector(selectAmmateur), for: .touchUpInside)
         return checkbox
     }()
@@ -64,6 +74,7 @@ final class OnboardingSelectLevelView: UIView {
     private lazy var thirdOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
         checkbox.text = "I’m a professional DJ"
+        checkbox.translatesAutoresizingMaskIntoConstraints = false
         checkbox.addTarget(self, action: #selector(selectProffesional), for: .touchUpInside)
         return checkbox
     }()
@@ -75,17 +86,16 @@ final class OnboardingSelectLevelView: UIView {
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.spacing = Paddings.checkbox
+        stackView.translatesAutoresizingMaskIntoConstraints = false
         [firstOption, secondOption, thirdOption].forEach { option in
             option.translatesAutoresizingMaskIntoConstraints = false
-            option.heightAnchor.constraint(equalToConstant: 48).isActive = true
         }
         return stackView
     }()
 
     // MARK: Constraints
 
-    private var headerConstraints = Constraints()
-    private var stackConstraints = Constraints()
+    private var dynamicConstraints = Constraints()
 
     // MARK: Init
 
@@ -104,29 +114,35 @@ final class OnboardingSelectLevelView: UIView {
     // MARK: Layout
 
     private func configureView() {
-        layoutHeaderView()
-        layoutStackView()
-
+        layoutChildren()
+        setupConstraints()
         activateConstraints()
     }
 
-    private func layoutHeaderView() {
+    private func layoutChildren() {
         iconView.translatesAutoresizingMaskIntoConstraints = false
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        topSpacer.backgroundColor = .blue
+        bottomSpacer.backgroundColor = .red
+        topSpacer.translatesAutoresizingMaskIntoConstraints = false
+        bottomSpacer.translatesAutoresizingMaskIntoConstraints = false
+
+        addSubview(topSpacer)
+        addSubview(bottomSpacer)
 
         headerView.addSubview(iconView)
         headerView.addSubview(titleLabel)
         headerView.addSubview(subtitleLabel)
 
-        headerView.translatesAutoresizingMaskIntoConstraints = false
         addSubview(headerView)
 
         NSLayoutConstraint.activate([
-            iconView.heightAnchor.constraint(equalToConstant: SelectLevelConstants.iconSize),
-            iconView.widthAnchor.constraint(equalToConstant: SelectLevelConstants.iconSize),
+            iconView.topAnchor.constraint(equalTo: headerView.topAnchor),
+            iconView.heightAnchor.constraint(lessThanOrEqualToConstant: SelectLevelConstants.iconSize),
+            iconView.widthAnchor.constraint(lessThanOrEqualToConstant: SelectLevelConstants.iconSize),
             iconView.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
-            iconView.topAnchor.constraint(greaterThanOrEqualTo: headerView.topAnchor),
 
             titleLabel.topAnchor.constraint(equalTo: iconView.bottomAnchor, constant: SelectLevelConstants.normal),
             titleLabel.leadingAnchor.constraint(equalTo: headerView.leadingAnchor),
@@ -138,39 +154,52 @@ final class OnboardingSelectLevelView: UIView {
             subtitleLabel.bottomAnchor.constraint(equalTo: headerView.bottomAnchor)
         ])
 
-        headerConstraints.portrait = [
-            headerView.topAnchor.constraint(equalTo: topAnchor),
-            headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
-            headerView.leadingAnchor.constraint(equalTo: leadingAnchor),
-            headerView.trailingAnchor.constraint(equalTo: trailingAnchor)
-        ]
-
-        headerConstraints.landscape = [
-            headerView.topAnchor.constraint(equalTo: topAnchor),
-            headerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -SelectLevelConstants.normal),
-            headerView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-            headerView.leadingAnchor.constraint(equalTo: leadingAnchor)
-        ]
+        optionsStackView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(optionsStackView)
     }
 
-    private func layoutStackView() {
-        optionsStackView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(optionsStackView)
+    private func setupConstraints() {
+        dynamicConstraints.portrait = [
+            topSpacer.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
+            topSpacer.widthAnchor.constraint(equalToConstant: 0),
+            topSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
 
-        stackConstraints.portrait = [
-            optionsStackView.bottomAnchor.constraint(greaterThanOrEqualTo: bottomAnchor),
+            headerView.topAnchor.constraint(equalTo: topSpacer.bottomAnchor),
+            headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
+            headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
+            headerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half),
+
             optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+            optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+
+            bottomSpacer.widthAnchor.constraint(equalToConstant: 0),
+            bottomSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bottomSpacer.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
+            bottomSpacer.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor)
+        ]
+
+        dynamicConstraints.landscape = [
+            topSpacer.topAnchor.constraint(equalTo: topAnchor),
+            topSpacer.widthAnchor.constraint(equalToConstant: 0),
+            topSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerView.topAnchor.constraint(equalTo: topSpacer.bottomAnchor),
+
+            headerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.normal * 2),
+            headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+
+            bottomSpacer.widthAnchor.constraint(equalToConstant: 0),
+            bottomSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bottomSpacer.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            bottomSpacer.bottomAnchor.constraint(equalTo: bottomAnchor),
+
+            topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor),
+
+            optionsStackView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            optionsStackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.normal * 2),
             optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal)
         ]
-
-        stackConstraints.landscape = [
-            optionsStackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: Paddings.half * 2),
-            optionsStackView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-            optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor)
-        ]
-
-        optionsStackView.translatesAutoresizingMaskIntoConstraints = false
-        addSubview(optionsStackView)
     }
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
@@ -180,15 +209,12 @@ final class OnboardingSelectLevelView: UIView {
     }
 
     private func activateConstraints() {
-        NSLayoutConstraint.deactivate(headerConstraints.portrait + headerConstraints.landscape)
-        NSLayoutConstraint.deactivate(stackConstraints.portrait + stackConstraints.landscape)
+        NSLayoutConstraint.deactivate(dynamicConstraints.portrait + dynamicConstraints.landscape)
 
         if traitCollection.verticalSizeClass == .regular {
-            NSLayoutConstraint.activate(headerConstraints.portrait)
-            NSLayoutConstraint.activate(stackConstraints.portrait)
+            NSLayoutConstraint.activate(dynamicConstraints.portrait)
         } else {
-            NSLayoutConstraint.activate(headerConstraints.landscape)
-            NSLayoutConstraint.activate(stackConstraints.landscape)
+            NSLayoutConstraint.activate(dynamicConstraints.landscape)
         }
     }
 

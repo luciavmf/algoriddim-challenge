@@ -97,7 +97,9 @@ final class OnboardingCheckbox: UIControl {
         NSLayoutConstraint.activate([
             checkbox.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.checkbox),
             checkbox.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.checkbox),
-            checkbox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half)
+            checkbox.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
+            checkbox.widthAnchor.constraint(equalToConstant: 24),
+            checkbox.widthAnchor.constraint(equalToConstant: 24)
         ])
 
         NSLayoutConstraint.activate([
@@ -107,18 +109,22 @@ final class OnboardingCheckbox: UIControl {
             border.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 2)
         ])
 
+        let heightConstraint = background.heightAnchor.constraint(equalToConstant: 48)
+        heightConstraint.priority = .defaultLow
+
         NSLayoutConstraint.activate([
             background.topAnchor.constraint(equalTo: topAnchor),
             background.leadingAnchor.constraint(equalTo: leadingAnchor),
             background.bottomAnchor.constraint(equalTo: bottomAnchor),
-            background.trailingAnchor.constraint(equalTo: trailingAnchor)
+            background.trailingAnchor.constraint(equalTo: trailingAnchor),
+            heightConstraint
         ])
 
         border.isHidden = !isSelected
 
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: topAnchor),
-            label.bottomAnchor.constraint(equalTo: bottomAnchor),
+            label.topAnchor.constraint(equalTo: background.topAnchor),
+            label.bottomAnchor.constraint(equalTo: background.bottomAnchor),
             label.leadingAnchor.constraint(equalTo: checkbox.trailingAnchor, constant: Paddings.half),
             label.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half)
         ])
