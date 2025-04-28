@@ -75,6 +75,9 @@ final class OnboardingWelcomeView: UIView {
 
 extension OnboardingWelcomeView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
+        if backwards {
+            logoView.isHidden = true
+        }
         completion()
     }
 
@@ -96,8 +99,10 @@ extension OnboardingWelcomeView: TransitionAnimatable {
                 self?.layoutIfNeeded()
             },
             completion: { [weak self] _ in
-                self?.logoView.isHidden = false
                 completion()
+                if backwards {
+                    self?.logoView.isHidden = false
+                }
             }
         )
     }

@@ -212,35 +212,45 @@ final class OnboardingHeroView: UIView {
 
 extension OnboardingHeroView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
-        animateLogo(backwards: backwards, completion: completion)
+        animateLogo(backwards: backwards)
+
+        let forwards = !backwards
+
+        heroView.alpha = forwards ? 0 : 1
+        heroView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
+        containerView.alpha = forwards ? 0 : 1
+        containerView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
 
         UIView.animate(
             withDuration: AnimationDuration.slow,
             delay: 0,
             usingSpringWithDamping: 0.7,
             initialSpringVelocity: 0.8,
-            options: [.curveEaseInOut]
-        ) { [weak self] in
-            guard let self else { return }
-            if backwards {
-                self.containerView.alpha = 0
-                self.containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-                heroView.alpha = 0
-                heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-            } else {
-                heroView.alpha = 1
-                heroView.transform = .identity
-                self.containerView.alpha = 1
-                self.containerView.transform = .identity
-            }
-        }
+            options: [.curveEaseInOut],
+            animations: { [weak self] in
+                guard let self else { return }
+                if backwards {
+                    self.containerView.alpha = 0
+                    self.containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                    heroView.alpha = 0
+                    heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                } else {
+                    heroView.alpha = 1
+                    heroView.transform = .identity
+                    self.containerView.alpha = 1
+                    self.containerView.transform = .identity
+                }
+            },
+            completion: { _ in
+                completion()
+            })
     }
 
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         slideAnimate(direction: .middleToLeft, backwards: backwards, completion: completion)
     }
 
-    private func animateLogo(backwards: Bool = false, completion: @escaping () -> Void = { }) {
+    private func animateLogo(backwards: Bool = false) {
         deactivateConstraints()
 
         if traitCollection.verticalSizeClass == .regular {
@@ -258,23 +268,9 @@ extension OnboardingHeroView: TransitionAnimatable {
             initialSpringVelocity: 0.5,
             options: [.curveEaseInOut],
             animations: { [weak self] in
-            // Animate the layout of the logo
-            self?.layoutIfNeeded()
-            }, completion: { _ in
-                completion()
+                // Animate the layout of the logo
+                self?.layoutIfNeeded()
             }
         )
-
-        if backwards {
-            heroView.alpha = 1
-            heroView.transform = .identity
-            containerView.alpha = 1
-            containerView.transform = .identity
-        } else {
-            heroView.alpha = 0
-            heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-            containerView.alpha = 0
-            containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
-        }
     }
 }
