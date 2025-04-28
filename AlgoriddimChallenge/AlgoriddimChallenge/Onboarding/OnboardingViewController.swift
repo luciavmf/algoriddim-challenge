@@ -250,54 +250,54 @@ final class OnboardingViewController: UIViewController {
         isAnimating = true
         setInteraction(enabled: false)
 
-        let animateBackwards = page < viewModel.currentPage.rawValue
+        let backwards = page < viewModel.currentPage.rawValue
         viewModel.currentPage = OnboardingPage(rawValue: page) ?? .welcome
 
         switch viewModel.currentPage {
         case .welcome:
-            animateWelcomeView(animateBackwards: animateBackwards)
+            presentWelcomeView(backwards: backwards)
 
         case .hero:
-            animateHeroView(animateBackwards: animateBackwards)
+            presentHeroView(backwards: backwards)
 
         case .selectLevel:
-            animateSelectLevelView(animateBackwards: animateBackwards)
+            presentSelectLevelView(backwards: backwards)
 
         case .custom:
-            animateCustomView(animateBackwards: animateBackwards)
+            presentCustomView(backwards: backwards)
         }
     }
 
-    private func animateWelcomeView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView? = !animateBackwards ? welcomeView : heroView
-        let viewOut: TransitionAnimatableView? = !animateBackwards ? nil : welcomeView
+    private func presentWelcomeView(backwards: Bool) {
+        let viewIn: TransitionAnimatableView? = !backwards ? welcomeView : heroView
+        let viewOut: TransitionAnimatableView? = !backwards ? nil : welcomeView
 
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: backwards)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
-    private func animateHeroView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
-        let viewOut: TransitionAnimatableView = !animateBackwards ? welcomeView : heroView
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+    private func presentHeroView(backwards: Bool) {
+        let viewIn: TransitionAnimatableView = !backwards ? heroView : selectLevelView
+        let viewOut: TransitionAnimatableView = !backwards ? welcomeView : heroView
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: backwards)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Continue", for: .normal)
     }
 
-    private func animateSelectLevelView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView = !animateBackwards ? selectLevelView : customView
-        let viewOut: TransitionAnimatableView = !animateBackwards ? heroView : selectLevelView
+    private func presentSelectLevelView(backwards: Bool) {
+        let viewIn: TransitionAnimatableView = !backwards ? selectLevelView : customView
+        let viewOut: TransitionAnimatableView = !backwards ? heroView : selectLevelView
 
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: backwards)
         onboardingButton.isEnabled = viewModel.selectedSkillLevel != nil
         onboardingButton.setTitle("Let's go", for: .normal)
     }
 
-    private func animateCustomView(animateBackwards: Bool) {
-        let viewIn: TransitionAnimatableView? = !animateBackwards ? customView : nil
-        let viewOut: TransitionAnimatableView? = !animateBackwards ? selectLevelView : nil
-        animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
+    private func presentCustomView(backwards: Bool) {
+        let viewIn: TransitionAnimatableView? = !backwards ? customView : nil
+        let viewOut: TransitionAnimatableView? = !backwards ? selectLevelView : nil
+        animate(viewIn: viewIn, viewOut: viewOut, backwards: backwards)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
         customView.selectedSkillLevel = viewModel.selectedSkillLevel
