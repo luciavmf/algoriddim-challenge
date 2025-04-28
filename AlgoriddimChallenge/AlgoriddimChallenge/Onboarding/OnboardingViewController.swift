@@ -300,6 +300,7 @@ final class OnboardingViewController: UIViewController {
         animate(viewIn: viewIn, viewOut: viewOut, backwards: animateBackwards)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
+        customView.selectedSkillLevel = viewModel.selectedSkillLevel
     }
 
     private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, backwards: Bool) {
