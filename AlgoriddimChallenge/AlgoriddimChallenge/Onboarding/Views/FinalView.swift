@@ -33,20 +33,13 @@ final class FinalView: UIView {
         return label
     }()
 
-    private var iconView: UIImageView  = {
-        let uiimageView = UIImageView()
-        uiimageView.contentMode = .center
-        uiimageView.image = UIImage(named: "Icon")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
-        return uiimageView
-    }()
-
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [iconView, titleLabel, subtitleLabel])
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.spacing = Paddings.normal
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        [iconView, titleLabel, subtitleLabel].forEach { option in
+        [titleLabel, subtitleLabel].forEach { option in
             option.translatesAutoresizingMaskIntoConstraints = false
         }
         return stackView
@@ -102,7 +95,7 @@ final class FinalView: UIView {
             NSLayoutConstraint.activate([
                 stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal * 2),
                 stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal * 2),
-                stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -(44 + Paddings.normal))
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -(Paddings.normal))
             ])
         }
     }
