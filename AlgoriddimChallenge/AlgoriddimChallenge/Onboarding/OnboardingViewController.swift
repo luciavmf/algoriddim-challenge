@@ -29,7 +29,7 @@ enum OnboardingPage: Int, CaseIterable {
     case welcome
     case hero
     case selectLevel
-    case custom
+    case final
 }
 
 /// The properties of the OnboardingViewController.
@@ -76,16 +76,16 @@ final class OnboardingViewController: UIViewController {
     // MARK: Constraints
 
     private var sharedComponentsConstraints = Constraints()
-    private var welcomeView = OnboardingWelcomeView()
-    private var heroView = OnboardingHeroView()
+    private var welcomeView = WelcomeView()
+    private var heroView = MixYourMusicView()
 
-    private lazy var selectLevelView: OnboardingSelectLevelView = {
-        let view = OnboardingSelectLevelView()
+    private lazy var selectLevelView: SelectSkillView = {
+        let view = SelectSkillView()
         view.delegate = self
         return view
     }()
 
-    private var customView = OnboardingCustomView()
+    private var finalView = FinalView()
 
     // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
     private var isAnimating: Bool = false
@@ -103,7 +103,7 @@ final class OnboardingViewController: UIViewController {
         layoutView(welcomeView)
         layoutView(heroView)
         layoutView(selectLevelView)
-        layoutView(customView)
+        layoutView(finalView)
 
         activateConstraints()
 
@@ -263,8 +263,8 @@ final class OnboardingViewController: UIViewController {
         case .selectLevel:
             presentSelectLevelView(transitionIn: isPresenting)
 
-        case .custom:
-            presentCustomView(transitionIn: isPresenting)
+        case .final:
+            presentFinalView(transitionIn: isPresenting)
         }
     }
 
@@ -286,7 +286,7 @@ final class OnboardingViewController: UIViewController {
     }
 
     private func presentSelectLevelView(transitionIn: Bool) {
-        let viewIn: TransitionAnimatableView = transitionIn ? selectLevelView : customView
+        let viewIn: TransitionAnimatableView = transitionIn ? selectLevelView : finalView
         let viewOut: TransitionAnimatableView = transitionIn ? heroView : selectLevelView
 
         animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
@@ -294,13 +294,13 @@ final class OnboardingViewController: UIViewController {
         onboardingButton.setTitle("Let's go", for: .normal)
     }
 
-    private func presentCustomView(transitionIn: Bool) {
-        let viewIn: TransitionAnimatableView? = transitionIn ? customView : nil
+    private func presentFinalView(transitionIn: Bool) {
+        let viewIn: TransitionAnimatableView? = transitionIn ? finalView : nil
         let viewOut: TransitionAnimatableView? = transitionIn ? selectLevelView : nil
         animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
-        customView.selectedSkillLevel = viewModel.selectedSkillLevel
+        finalView.selectedSkillLevel = viewModel.selectedSkillLevel
     }
 
     private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, transitionIn: Bool) {
@@ -344,9 +344,9 @@ final class OnboardingViewController: UIViewController {
     }
 }
 
-extension OnboardingViewController: @preconcurrency OnboardingSelectLevelViewDelegate {
+extension OnboardingViewController: @preconcurrency SelectSkillViewDelegate {
     @MainActor
-    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel) {
+    func selectSkillView(_ view: SelectSkillView, didSelectSkill level: SkillLevel) {
 
         if viewModel.selectedSkillLevel == level {
             viewModel.selectedSkillLevel = nil

@@ -1,5 +1,5 @@
 //
-//  OnboardingCustomView.swift
+//  FinalView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 27.04.25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class OnboardingCustomView: UIView {
+final class FinalView: UIView {
     private var titleLabel: UILabel  = {
         let label = UILabel()
         label.text = "Start Mixing"
@@ -97,7 +97,7 @@ final class OnboardingCustomView: UIView {
     }
 }
 
-extension OnboardingCustomView: TransitionAnimatable {
+extension FinalView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
         slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
     }

@@ -1,5 +1,5 @@
 //
-//  OnboardingPageHeroView.swift
+//  MixYourMusicView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 24.04.25.
@@ -13,7 +13,7 @@ struct CustomImageSize {
     static var heroHeight: CGFloat = DeviceScreenSize.width <= 375 ? 100 : 140
 }
 
-final class OnboardingHeroView: UIView {
+final class MixYourMusicView: UIView {
     @MainActor
     private struct LabelConstants {
         static var numberOfLines: Int = DeviceScreenSize.width <= 375 ? 1 : 0
@@ -225,7 +225,7 @@ final class OnboardingHeroView: UIView {
 
 // MARK: Animations
 
-extension OnboardingHeroView: TransitionAnimatable {
+extension MixYourMusicView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         animateLogo(backwards: backwards)
 

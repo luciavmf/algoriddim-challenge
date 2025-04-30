@@ -1,5 +1,5 @@
 //
-//  OnboardingSelectLevelView.swift
+//  SelectSkillView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 24.04.25.
@@ -7,11 +7,11 @@
 
 import UIKit
 
-protocol OnboardingSelectLevelViewDelegate: AnyObject {
-    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel)
+protocol SelectSkillViewDelegate: AnyObject {
+    func selectSkillView(_ view: SelectSkillView, didSelectSkill level: SkillLevel)
 }
 
-final class OnboardingSelectLevelView: UIView {
+final class SelectSkillView: UIView {
     @MainActor
     private struct SelectLevelConstants {
         static let normal: CGFloat = DeviceScreenSize.width <= 375 ? 20 : 40
@@ -79,7 +79,7 @@ final class OnboardingSelectLevelView: UIView {
         return checkbox
     }()
 
-    weak var delegate: OnboardingSelectLevelViewDelegate?
+    weak var delegate: SelectSkillViewDelegate?
 
     private lazy var optionsStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [firstOption, secondOption, thirdOption])
@@ -212,25 +212,25 @@ final class OnboardingSelectLevelView: UIView {
     @objc private func selectNew() {
         secondOption.isSelected = false
         thirdOption.isSelected = false
-        delegate?.onboardingSelectLevelView(self, didSelectLevel: .new)
+        delegate?.selectSkillView(self, didSelectSkill: .new)
     }
 
     @objc private func selectAmmateur() {
         firstOption.isSelected = false
         thirdOption.isSelected = false
-        delegate?.onboardingSelectLevelView(self, didSelectLevel: .ammateur)
+        delegate?.selectSkillView(self, didSelectSkill: .ammateur)
     }
 
     @objc private func selectProffesional() {
         firstOption.isSelected = false
         secondOption.isSelected = false
-        delegate?.onboardingSelectLevelView(self, didSelectLevel: .professional)
+        delegate?.selectSkillView(self, didSelectSkill: .professional)
     }
 }
 
 // MARK: Animations
 
-extension OnboardingSelectLevelView: TransitionAnimatable {
+extension SelectSkillView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
     }
