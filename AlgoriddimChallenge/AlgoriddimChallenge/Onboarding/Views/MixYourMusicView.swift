@@ -1,5 +1,5 @@
 //
-//  OnboardingPageHeroView.swift
+//  MixYourMusicView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 24.04.25.
@@ -13,7 +13,7 @@ struct CustomImageSize {
     static var heroHeight: CGFloat = DeviceScreenSize.width <= 375 ? 100 : 140
 }
 
-final class OnboardingHeroView: UIView {
+final class MixYourMusicView: UIView {
     @MainActor
     private struct LabelConstants {
         static var numberOfLines: Int = DeviceScreenSize.width <= 375 ? 1 : 0
@@ -36,30 +36,12 @@ final class OnboardingHeroView: UIView {
         return uiimageView
     }()
 
-    private var titleLabel: UILabel  = {
-        let label = UILabel()
-        label.text = "Mix Your Favorite Music"
-        label.font = .systemFont(ofSize: FontConstants.titleFontSize, weight: .bold)
-        label.numberOfLines = LabelConstants.numberOfLines
-        label.adjustsFontSizeToFitWidth = true
-        label.setContentHuggingPriority(.defaultLow, for: .vertical)
-        label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        label.textAlignment = .center
-        label.textColor = .white
-        return label
-    }()
-
-    private var appleDesignAwardView: UIImageView = {
-        let uiimageView = UIImageView()
-        uiimageView.contentMode = .scaleAspectFit
-        uiimageView.setContentHuggingPriority(.defaultHigh, for: .vertical)
-        uiimageView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
-        uiimageView.image = UIImage(named: "AppleDesignAward")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
-        return uiimageView
-    }()
+    // Layout guides used to center the whole view
+    private let topSpace = UILayoutGuide()
+    private let bottomSpace = UILayoutGuide()
 
     /// A view that holds the title and the apple design award view.
-    private lazy var containerView = UIView()
+    private lazy var titleAndADAView = UIView()
 
     /// The constraints of the view in landscape and portrait mode.
     private var dynamicConstraints = Constraints()
@@ -84,19 +66,17 @@ final class OnboardingHeroView: UIView {
     // MARK: Layout
 
     private func layoutChildren() {
-        titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        appleDesignAwardView.translatesAutoresizingMaskIntoConstraints = false
-
-        containerView.addSubview(titleLabel)
-        containerView.addSubview(appleDesignAwardView)
+        layoutTitleAndADAView()
 
         logoView.translatesAutoresizingMaskIntoConstraints = false
-        containerView.translatesAutoresizingMaskIntoConstraints = false
         heroView.translatesAutoresizingMaskIntoConstraints = false
 
         addSubview(heroView)
-        addSubview(containerView)
+        addSubview(titleAndADAView)
         addSubview(logoView)
+
+        addLayoutGuide(topSpace)
+        addLayoutGuide(bottomSpace)
 
         logoInitialConstraint.portrait = [
             logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
@@ -104,7 +84,6 @@ final class OnboardingHeroView: UIView {
         ]
 
         logoFinalConstraint.portrait = [
-            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: -Paddings.normal),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -116,11 +95,10 @@ final class OnboardingHeroView: UIView {
         logoFinalConstraint.landscape = [
             logoView.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor, constant: Paddings.normal),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor),
-            logoView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -Paddings.normal)
+            logoView.bottomAnchor.constraint(equalTo: titleAndADAView.topAnchor, constant: -Paddings.normal)
         ]
 
-        dynamicConstraints.portrait = makePortraitConstraints()
-        dynamicConstraints.landscape = makeLandscapeConstraints()
+        dynamicConstraints = makeDynamicConstraints()
 
         if traitCollection.verticalSizeClass == .regular {
             NSLayoutConstraint.activate(dynamicConstraints.portrait)
@@ -131,50 +109,87 @@ final class OnboardingHeroView: UIView {
         }
     }
 
-    private func makePortraitConstraints() -> [NSLayoutConstraint] {
-        [
+    private func makeTitleLabel() -> UILabel {
+        let label = UILabel()
+        label.text = "Mix Your Favorite Music"
+        label.font = .systemFont(ofSize: FontConstants.titleFontSize, weight: .bold)
+        label.numberOfLines = LabelConstants.numberOfLines
+        label.adjustsFontSizeToFitWidth = true
+        label.setContentHuggingPriority(.defaultLow, for: .vertical)
+        label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
+        label.textAlignment = .center
+        label.textColor = .white
+        return label
+    }
+
+    private func makeAppleDesignAwardView() -> UIImageView {
+        let uiimageView = UIImageView()
+        uiimageView.contentMode = .scaleAspectFit
+        uiimageView.setContentHuggingPriority(.defaultHigh, for: .vertical)
+        uiimageView.setContentCompressionResistancePriority(.defaultHigh, for: .vertical)
+        uiimageView.image = UIImage(named: "AppleDesignAward")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
+        return uiimageView
+    }
+
+    private func layoutTitleAndADAView() {
+        let titleLabel = makeTitleLabel()
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+
+        let appleDesignAwardView = makeAppleDesignAwardView()
+        appleDesignAwardView.translatesAutoresizingMaskIntoConstraints = false
+
+        titleAndADAView.addSubview(titleLabel)
+        titleAndADAView.addSubview(appleDesignAwardView)
+        titleAndADAView.translatesAutoresizingMaskIntoConstraints = false
+
+        NSLayoutConstraint.activate([
+            titleLabel.topAnchor.constraint(equalTo: titleAndADAView.topAnchor),
+            titleLabel.leadingAnchor.constraint(equalTo: titleAndADAView.leadingAnchor),
+            titleLabel.trailingAnchor.constraint(equalTo: titleAndADAView.trailingAnchor),
+            appleDesignAwardView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Paddings.normal),
+            appleDesignAwardView.bottomAnchor.constraint(equalTo: titleAndADAView.bottomAnchor),
+            appleDesignAwardView.leadingAnchor.constraint(equalTo: titleAndADAView.leadingAnchor),
+            appleDesignAwardView.trailingAnchor.constraint(equalTo: titleAndADAView.trailingAnchor)
+        ])
+    }
+
+    private func makeDynamicConstraints() -> Constraints {
+        var constraint = Constraints()
+        let spaceHeight = topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
+        spaceHeight.priority = .defaultLow
+
+        constraint.portrait = [
+            topSpace.topAnchor.constraint(equalTo: topAnchor),
+            topSpace.bottomAnchor.constraint(equalTo: logoView.topAnchor),
+
             logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
+            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: -Paddings.normal),
             heroView.heightAnchor.constraint(equalToConstant: CustomImageSize.heroHeight),
             heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             heroView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            heroView.bottomAnchor.constraint(equalTo: containerView.topAnchor, constant: -Paddings.normal),
+            heroView.bottomAnchor.constraint(equalTo: titleAndADAView.topAnchor, constant: -Paddings.normal),
 
-            containerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.normal),
+            titleAndADAView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+            titleAndADAView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
 
-            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-
-            appleDesignAwardView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Paddings.normal),
-            appleDesignAwardView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            appleDesignAwardView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            appleDesignAwardView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+            bottomSpace.topAnchor.constraint(equalTo: titleAndADAView.bottomAnchor),
+            bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.normal),
+            spaceHeight
         ]
-    }
 
-    private func makeLandscapeConstraints() -> [NSLayoutConstraint] {
-        [
+        constraint.landscape = [
             logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
 
-            heroView.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+            heroView.centerYAnchor.constraint(equalTo: titleAndADAView.centerYAnchor),
             heroView.widthAnchor.constraint(equalTo: safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
             heroView.leadingAnchor.constraint(equalTo: leadingAnchor),
 
-            containerView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
-            containerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            containerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2),
-
-            titleLabel.topAnchor.constraint(equalTo: containerView.topAnchor),
-            titleLabel.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            titleLabel.trailingAnchor.constraint(equalTo: containerView.trailingAnchor),
-
-            appleDesignAwardView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: Paddings.half),
-            appleDesignAwardView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            appleDesignAwardView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            appleDesignAwardView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+            titleAndADAView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
+            titleAndADAView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+            titleAndADAView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.half * 2)
         ]
+
+        return constraint
     }
 
     // MARK: Landscape - Portrait
@@ -184,7 +199,7 @@ final class OnboardingHeroView: UIView {
 
         if previousTraitCollection?.verticalSizeClass != traitCollection.verticalSizeClass ||
             previousTraitCollection?.horizontalSizeClass != traitCollection.horizontalSizeClass {
-            activateCurrentConstraints()
+            activateConstraints()
         }
     }
 
@@ -194,7 +209,7 @@ final class OnboardingHeroView: UIView {
         NSLayoutConstraint.deactivate(logoFinalConstraint.portrait + logoFinalConstraint.landscape)
     }
 
-    private func activateCurrentConstraints() {
+    private func activateConstraints() {
         deactivateConstraints()
 
         if traitCollection.verticalSizeClass == .regular {
@@ -210,7 +225,7 @@ final class OnboardingHeroView: UIView {
 
 // MARK: Animations
 
-extension OnboardingHeroView: TransitionAnimatable {
+extension MixYourMusicView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool = false, completion: @escaping () -> Void = { }) {
         animateLogo(backwards: backwards)
 
@@ -218,8 +233,8 @@ extension OnboardingHeroView: TransitionAnimatable {
 
         heroView.alpha = forwards ? 0 : 1
         heroView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
-        containerView.alpha = forwards ? 0 : 1
-        containerView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
+        titleAndADAView.alpha = forwards ? 0 : 1
+        titleAndADAView.transform = forwards ? CGAffineTransform(scaleX: 0.3, y: 0.5) : .identity
 
         UIView.animate(
             withDuration: AnimationDuration.slow,
@@ -230,15 +245,15 @@ extension OnboardingHeroView: TransitionAnimatable {
             animations: { [weak self] in
                 guard let self else { return }
                 if backwards {
-                    self.containerView.alpha = 0
-                    self.containerView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                    self.titleAndADAView.alpha = 0
+                    self.titleAndADAView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
                     heroView.alpha = 0
                     heroView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
                 } else {
                     heroView.alpha = 1
                     heroView.transform = .identity
-                    self.containerView.alpha = 1
-                    self.containerView.transform = .identity
+                    self.titleAndADAView.alpha = 1
+                    self.titleAndADAView.transform = .identity
                 }
             },
             completion: { _ in

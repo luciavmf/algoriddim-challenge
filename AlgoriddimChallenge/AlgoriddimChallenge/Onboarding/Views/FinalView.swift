@@ -1,5 +1,5 @@
 //
-//  OnboardingCustomView.swift
+//  FinalView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 27.04.25.
@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class OnboardingCustomView: UIView {
+final class FinalView: UIView {
     private var titleLabel: UILabel  = {
         let label = UILabel()
         label.text = "Start Mixing"
@@ -33,20 +33,13 @@ final class OnboardingCustomView: UIView {
         return label
     }()
 
-    private var iconView: UIImageView  = {
-        let uiimageView = UIImageView()
-        uiimageView.contentMode = .center
-        uiimageView.image = UIImage(named: "Icon")?.withRenderingMode(.alwaysOriginal) ?? UIImage()
-        return uiimageView
-    }()
-
     private lazy var stackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [iconView, titleLabel, subtitleLabel])
+        let stackView = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
         stackView.axis = .vertical
         stackView.alignment = .fill
         stackView.spacing = Paddings.normal
         stackView.translatesAutoresizingMaskIntoConstraints = false
-        [iconView, titleLabel, subtitleLabel].forEach { option in
+        [titleLabel, subtitleLabel].forEach { option in
             option.translatesAutoresizingMaskIntoConstraints = false
         }
         return stackView
@@ -73,33 +66,81 @@ final class OnboardingCustomView: UIView {
         confiure()
     }
 
+    public lazy var particlesBackgroundView: ParticlesBackgroundView = {
+        let particles = ParticlesBackgroundView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+        particles.translatesAutoresizingMaskIntoConstraints = false
+        return particles
+    }()
+
     // MARK: Configure
 
     func confiure() {
-        let particles = ParticlesBackgroundView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-        particles.translatesAutoresizingMaskIntoConstraints = false
-        particles.clipsToBounds = true
-        addSubview(particles)
+        addSubview(particlesBackgroundView)
 
         NSLayoutConstraint.activate([
-            particles.leadingAnchor.constraint(equalTo: leadingAnchor),
-            particles.trailingAnchor.constraint(equalTo: trailingAnchor),
-            particles.topAnchor.constraint(equalTo: topAnchor),
-            particles.bottomAnchor.constraint(equalTo: bottomAnchor)
+            particlesBackgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            particlesBackgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            particlesBackgroundView.topAnchor.constraint(equalTo: topAnchor),
+            particlesBackgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
         addSubview(stackView)
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                stackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: Paddings.normal * -2),
+                stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal * 2),
+                stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal * 2),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -(Paddings.normal))
+            ])
+        }
     }
 }
 
-extension OnboardingCustomView: TransitionAnimatable {
+extension FinalView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
-        slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
+        let group = DispatchGroup()
+
+        group.enter()
+        particlesBackgroundView.fadeIn(duration: AnimationDuration.fast, delay: backwards ? AnimationDuration.slow : 0, backwards: backwards, completion: {
+            group.leave()
+        })
+
+        if backwards {
+            stackView.alpha = 1
+            stackView.transform = .identity
+        } else {
+            stackView.alpha = 0
+            stackView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+        }
+        group.enter()
+        UIView.animate(
+            withDuration: AnimationDuration.slow,
+            delay: backwards ? 0 : AnimationDuration.fast,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.8,
+            options: [.curveEaseInOut],
+            animations: { [weak self] in
+                guard let self else { return }
+                if backwards {
+                    stackView.alpha = 0
+                    stackView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                } else {
+                    stackView.alpha = 1
+                    stackView.transform = .identity
+                }
+            },
+            completion: { _ in
+                group.leave()
+            })
+
+        group.notify(queue: .main) {
+            completion()
+        }
     }
 
     func animateTransitionOut(backwards: Bool, completion: @escaping () -> Void) {

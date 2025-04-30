@@ -29,7 +29,7 @@ enum OnboardingPage: Int, CaseIterable {
     case welcome
     case hero
     case selectLevel
-    case custom
+    case final
 }
 
 /// The properties of the OnboardingViewController.
@@ -76,16 +76,16 @@ final class OnboardingViewController: UIViewController {
     // MARK: Constraints
 
     private var sharedComponentsConstraints = Constraints()
-    private var welcomeView = OnboardingWelcomeView()
-    private var heroView = OnboardingHeroView()
+    private var welcomeView = WelcomeView()
+    private var heroView = MixYourMusicView()
 
-    private lazy var selectLevelView: OnboardingSelectLevelView = {
-        let view = OnboardingSelectLevelView()
+    private lazy var selectLevelView: SelectSkillView = {
+        let view = SelectSkillView()
         view.delegate = self
         return view
     }()
 
-    private var customView = OnboardingCustomView()
+    private var finalView = FinalView()
 
     // Whether the app is animating or not. Used to prevent ot other views to animate at the same time.
     private var isAnimating: Bool = false
@@ -98,18 +98,19 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
+        layoutFinalView()
+
         layoutSharedComponents()
 
         layoutView(welcomeView)
         layoutView(heroView)
         layoutView(selectLevelView)
-        layoutView(customView)
 
-        activateCurrentConstraints()
-
-        presentPage(pageIndex: viewModel.currentPage.rawValue)
+        activateConstraints()
 
         setupSwipeGestures()
+
+        welcomeView.isHidden = false
     }
 
     // MARK: Setup
@@ -145,15 +146,27 @@ final class OnboardingViewController: UIViewController {
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(pageControl)
 
-        sharedComponentsConstraints.portrait = [
-            onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
-            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
-            onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
-            onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
-            pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
-        ]
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            sharedComponentsConstraints.portrait = [
+                onboardingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+                onboardingButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: Paddings.half * -2),
+                onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
+                onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
+                pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
+                pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+            ]
+        } else {
+            sharedComponentsConstraints.portrait = [
+                onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+                onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
+                onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
+                onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
+                pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
+                pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+            ]
+        }
 
         sharedComponentsConstraints.landscape = [
             onboardingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
@@ -180,15 +193,29 @@ final class OnboardingViewController: UIViewController {
         view.isHidden = true
     }
 
+    private func layoutFinalView() {
+        finalView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(finalView)
+
+        NSLayoutConstraint.activate([
+            finalView.topAnchor.constraint(equalTo: view.topAnchor),
+            finalView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            finalView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            finalView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+
+        finalView.isHidden = true
+    }
+
     // MARK: Landscape - Portrait
 
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-        activateCurrentConstraints()
+        activateConstraints()
     }
 
-    private func activateCurrentConstraints() {
+    private func activateConstraints() {
         NSLayoutConstraint.deactivate(sharedComponentsConstraints.portrait + sharedComponentsConstraints.landscape)
 
         if traitCollection.verticalSizeClass == .regular {
@@ -263,8 +290,8 @@ final class OnboardingViewController: UIViewController {
         case .selectLevel:
             presentSelectLevelView(transitionIn: isPresenting)
 
-        case .custom:
-            presentCustomView(transitionIn: isPresenting)
+        case .final:
+            presentFinalView(transitionIn: isPresenting)
         }
     }
 
@@ -286,7 +313,7 @@ final class OnboardingViewController: UIViewController {
     }
 
     private func presentSelectLevelView(transitionIn: Bool) {
-        let viewIn: TransitionAnimatableView = transitionIn ? selectLevelView : customView
+        let viewIn: TransitionAnimatableView = transitionIn ? selectLevelView : finalView
         let viewOut: TransitionAnimatableView = transitionIn ? heroView : selectLevelView
 
         animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
@@ -294,13 +321,13 @@ final class OnboardingViewController: UIViewController {
         onboardingButton.setTitle("Let's go", for: .normal)
     }
 
-    private func presentCustomView(transitionIn: Bool) {
-        let viewIn: TransitionAnimatableView? = transitionIn ? customView : nil
+    private func presentFinalView(transitionIn: Bool) {
+        let viewIn: TransitionAnimatableView? = transitionIn ? finalView : nil
         let viewOut: TransitionAnimatableView? = transitionIn ? selectLevelView : nil
         animate(viewIn: viewIn, viewOut: viewOut, transitionIn: transitionIn)
         onboardingButton.isEnabled = true
         onboardingButton.setTitle("Done", for: .normal)
-        customView.selectedSkillLevel = viewModel.selectedSkillLevel
+        finalView.selectedSkillLevel = viewModel.selectedSkillLevel
     }
 
     private func animate(viewIn: TransitionAnimatableView?, viewOut: TransitionAnimatableView?, transitionIn: Bool) {
@@ -344,9 +371,9 @@ final class OnboardingViewController: UIViewController {
     }
 }
 
-extension OnboardingViewController: @preconcurrency OnboardingSelectLevelViewDelegate {
+extension OnboardingViewController: @preconcurrency SelectSkillViewDelegate {
     @MainActor
-    func onboardingSelectLevelView(_ view: OnboardingSelectLevelView, didSelectLevel level: SkillLevel) {
+    func selectSkillView(_ view: SelectSkillView, didSelectSkill level: SkillLevel) {
 
         if viewModel.selectedSkillLevel == level {
             viewModel.selectedSkillLevel = nil

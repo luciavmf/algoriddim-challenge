@@ -1,5 +1,5 @@
 //
-//  OnboardingWelcomeView.swift
+//  WelcomeView.swift
 //  AlgoriddimChallenge
 //
 //  Created by Lucia Medina Fretes on 25.04.25.
@@ -7,9 +7,8 @@
 
 import UIKit
 
-final class OnboardingWelcomeView: UIView {
+final class WelcomeView: UIView {
     private var dynamicConstraints = AnimatedConstraints()
-    public var isAnimating: Bool = false
 
     private var logoView: UIImageView = {
         let uiimageView = UIImageView()
@@ -73,11 +72,8 @@ final class OnboardingWelcomeView: UIView {
 
 // MARK: Animations
 
-extension OnboardingWelcomeView: TransitionAnimatable {
+extension WelcomeView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
-        if backwards {
-            logoView.isHidden = true
-        }
         completion()
     }
 
