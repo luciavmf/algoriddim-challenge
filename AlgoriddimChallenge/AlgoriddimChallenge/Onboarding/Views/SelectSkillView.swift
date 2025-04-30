@@ -154,22 +154,41 @@ final class SelectSkillView: UIView {
     }
 
     private func setupConstraints() {
-        dynamicConstraints.portrait = [
-            topSpace.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
-            topSpace.bottomAnchor.constraint(equalTo: headerView.topAnchor),
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            dynamicConstraints.portrait = [
+                topSpace.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
+                topSpace.bottomAnchor.constraint(equalTo: headerView.topAnchor),
 
-            headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
-            headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
-            headerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half),
+                headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
+                headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
+                headerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half),
 
-            optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-            optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+                optionsStackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: Paddings.normal * -2),
+                optionsStackView.centerXAnchor.constraint(equalTo: centerXAnchor),
 
-            bottomSpace.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
-            bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
+                bottomSpace.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
+                bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
 
-            topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
-        ]
+                topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
+            ]
+        } else {
+            dynamicConstraints.portrait = [
+                topSpace.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
+                topSpace.bottomAnchor.constraint(equalTo: headerView.topAnchor),
+
+                headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
+                headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
+                headerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half),
+
+                optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+                optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+
+                bottomSpace.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
+                bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
+
+                topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
+            ]
+        }
 
         dynamicConstraints.landscape = [
             topSpace.topAnchor.constraint(equalTo: topAnchor),

@@ -145,15 +145,27 @@ final class OnboardingViewController: UIViewController {
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         view.addSubview(pageControl)
 
-        sharedComponentsConstraints.portrait = [
-            onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
-            onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
-            onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
-            onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
-            pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
-            pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
-        ]
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            sharedComponentsConstraints.portrait = [
+                onboardingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),
+                onboardingButton.widthAnchor.constraint(equalTo: view.safeAreaLayoutGuide.widthAnchor, multiplier: 0.5, constant: Paddings.half * -2),
+                onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
+                onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
+                pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
+                pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+            ]
+        } else {
+            sharedComponentsConstraints.portrait = [
+                onboardingButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: Paddings.normal),
+                onboardingButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -Paddings.normal),
+                onboardingButton.bottomAnchor.constraint(equalTo: pageControl.topAnchor, constant: -Paddings.third),
+                onboardingButton.heightAnchor.constraint(equalToConstant: SharedComponentSizes.buttonHeight),
+                pageControl.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                pageControl.heightAnchor.constraint(equalToConstant: SharedComponentSizes.pageControlHeight),
+                pageControl.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -Paddings.half)
+            ]
+        }
 
         sharedComponentsConstraints.landscape = [
             onboardingButton.centerXAnchor.constraint(equalTo: view.safeAreaLayoutGuide.centerXAnchor),

@@ -89,11 +89,19 @@ final class FinalView: UIView {
         ])
 
         addSubview(stackView)
-        NSLayoutConstraint.activate([
-            stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-            stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
-        ])
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            NSLayoutConstraint.activate([
+                stackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: Paddings.normal * -2),
+                stackView.centerXAnchor.constraint(equalTo: centerXAnchor),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
+        } else {
+            NSLayoutConstraint.activate([
+                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
+                stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
+            ])
+        }
     }
 }
 
