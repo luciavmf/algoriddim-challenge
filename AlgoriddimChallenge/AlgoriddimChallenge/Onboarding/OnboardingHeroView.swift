@@ -36,6 +36,10 @@ final class OnboardingHeroView: UIView {
         return uiimageView
     }()
 
+    // Layout guides used to center the whole view
+    private let topSpace = UILayoutGuide()
+    private let bottomSpace = UILayoutGuide()
+
     /// A view that holds the title and the apple design award view.
     private lazy var titleAndADAView = UIView()
 
@@ -71,13 +75,15 @@ final class OnboardingHeroView: UIView {
         addSubview(titleAndADAView)
         addSubview(logoView)
 
+        addLayoutGuide(topSpace)
+        addLayoutGuide(bottomSpace)
+
         logoInitialConstraint.portrait = [
             logoView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: bounds.height * -0.15),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
         logoFinalConstraint.portrait = [
-            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: -Paddings.normal),
             logoView.centerXAnchor.constraint(equalTo: centerXAnchor)
         ]
 
@@ -149,9 +155,15 @@ final class OnboardingHeroView: UIView {
 
     private func makeDynamicConstraints() -> Constraints {
         var constraint = Constraints()
-        constraint.portrait = [
-            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
+        let spaceHeight = topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
+        spaceHeight.priority = .defaultLow
 
+        constraint.portrait = [
+            topSpace.topAnchor.constraint(equalTo: topAnchor),
+            topSpace.bottomAnchor.constraint(equalTo: logoView.topAnchor),
+
+            logoView.heightAnchor.constraint(equalToConstant: CustomImageSize.logoHeight),
+            logoView.bottomAnchor.constraint(equalTo: heroView.topAnchor, constant: -Paddings.normal),
             heroView.heightAnchor.constraint(equalToConstant: CustomImageSize.heroHeight),
             heroView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             heroView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
@@ -159,7 +171,10 @@ final class OnboardingHeroView: UIView {
 
             titleAndADAView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             titleAndADAView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-            titleAndADAView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.normal)
+
+            bottomSpace.topAnchor.constraint(equalTo: titleAndADAView.bottomAnchor),
+            bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: Paddings.normal),
+            spaceHeight
         ]
 
         constraint.landscape = [
