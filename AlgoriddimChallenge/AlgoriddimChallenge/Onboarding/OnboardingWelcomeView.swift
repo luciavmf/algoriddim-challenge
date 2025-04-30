@@ -9,7 +9,6 @@ import UIKit
 
 final class OnboardingWelcomeView: UIView {
     private var dynamicConstraints = AnimatedConstraints()
-    public var isAnimating: Bool = false
 
     private var logoView: UIImageView = {
         let uiimageView = UIImageView()
@@ -75,9 +74,6 @@ final class OnboardingWelcomeView: UIView {
 
 extension OnboardingWelcomeView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
-        if backwards {
-            logoView.isHidden = true
-        }
         completion()
     }
 
