@@ -51,9 +51,9 @@ final class OnboardingSelectLevelView: UIView {
         return view
     }()
 
-    // Spacers views used to center the whole view
-    private let topSpacer = UIView()
-    private let bottomSpacer = UIView()
+    // Layout guides used to center the whole view
+    private let topSpace = UILayoutGuide()
+    private let bottomSpace = UILayoutGuide()
 
     private lazy var firstOption: OnboardingCheckbox = {
         let checkbox = OnboardingCheckbox()
@@ -124,13 +124,8 @@ final class OnboardingSelectLevelView: UIView {
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         subtitleLabel.translatesAutoresizingMaskIntoConstraints = false
 
-        topSpacer.backgroundColor = .blue
-        bottomSpacer.backgroundColor = .red
-        topSpacer.translatesAutoresizingMaskIntoConstraints = false
-        bottomSpacer.translatesAutoresizingMaskIntoConstraints = false
-
-        addSubview(topSpacer)
-        addSubview(bottomSpacer)
+        addLayoutGuide(topSpace)
+        addLayoutGuide(bottomSpace)
 
         headerView.addSubview(iconView)
         headerView.addSubview(titleLabel)
@@ -160,11 +155,9 @@ final class OnboardingSelectLevelView: UIView {
 
     private func setupConstraints() {
         dynamicConstraints.portrait = [
-            topSpacer.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
-            topSpacer.widthAnchor.constraint(equalToConstant: 0),
-            topSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
+            topSpace.topAnchor.constraint(equalTo: topAnchor, constant: Paddings.normal),
+            topSpace.bottomAnchor.constraint(equalTo: headerView.topAnchor),
 
-            headerView.topAnchor.constraint(equalTo: topSpacer.bottomAnchor),
             headerView.bottomAnchor.constraint(equalTo: optionsStackView.topAnchor, constant: -SelectLevelConstants.normal),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.half),
             headerView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.half),
@@ -172,29 +165,25 @@ final class OnboardingSelectLevelView: UIView {
             optionsStackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
             optionsStackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
 
-            bottomSpacer.widthAnchor.constraint(equalToConstant: 0),
-            bottomSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bottomSpacer.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
-            bottomSpacer.bottomAnchor.constraint(equalTo: bottomAnchor),
+            bottomSpace.topAnchor.constraint(equalTo: optionsStackView.bottomAnchor),
+            bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -Paddings.half),
 
-            topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor)
+            topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor)
         ]
 
         dynamicConstraints.landscape = [
-            topSpacer.topAnchor.constraint(equalTo: topAnchor),
-            topSpacer.widthAnchor.constraint(equalToConstant: 0),
-            topSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
-            headerView.topAnchor.constraint(equalTo: topSpacer.bottomAnchor),
+            topSpace.topAnchor.constraint(equalTo: topAnchor),
+            topSpace.leadingAnchor.constraint(equalTo: leadingAnchor),
+            headerView.topAnchor.constraint(equalTo: topSpace.bottomAnchor),
 
             headerView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.normal * 2),
             headerView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
 
-            bottomSpacer.widthAnchor.constraint(equalToConstant: 0),
-            bottomSpacer.leadingAnchor.constraint(equalTo: leadingAnchor),
-            bottomSpacer.topAnchor.constraint(equalTo: headerView.bottomAnchor),
-            bottomSpacer.bottomAnchor.constraint(equalTo: bottomAnchor),
+            bottomSpace.leadingAnchor.constraint(equalTo: leadingAnchor),
+            bottomSpace.topAnchor.constraint(equalTo: headerView.bottomAnchor),
+            bottomSpace.bottomAnchor.constraint(equalTo: bottomAnchor),
 
-            topSpacer.heightAnchor.constraint(equalTo: bottomSpacer.heightAnchor),
+            topSpace.heightAnchor.constraint(equalTo: bottomSpace.heightAnchor),
 
             optionsStackView.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
             optionsStackView.widthAnchor.constraint(equalTo: widthAnchor, multiplier: 0.5, constant: -Paddings.normal * 2),
