@@ -97,9 +97,9 @@ final class FinalView: UIView {
             ])
         } else {
             NSLayoutConstraint.activate([
-                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal),
-                stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal),
-                stackView.centerYAnchor.constraint(equalTo: centerYAnchor)
+                stackView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: Paddings.normal * 2),
+                stackView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -Paddings.normal * 2),
+                stackView.centerYAnchor.constraint(equalTo: centerYAnchor, constant: -(44 + Paddings.normal))
             ])
         }
     }

@@ -98,12 +98,13 @@ final class OnboardingViewController: UIViewController {
         super.viewDidLoad()
 
         layoutBackground()
+        layoutFinalView()
+
         layoutSharedComponents()
 
         layoutView(welcomeView)
         layoutView(heroView)
         layoutView(selectLevelView)
-        layoutView(finalView)
 
         activateConstraints()
 
@@ -190,6 +191,20 @@ final class OnboardingViewController: UIViewController {
         ])
 
         view.isHidden = true
+    }
+
+    private func layoutFinalView() {
+        finalView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(finalView)
+
+        NSLayoutConstraint.activate([
+            finalView.topAnchor.constraint(equalTo: view.topAnchor),
+            finalView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            finalView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            finalView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+
+        finalView.isHidden = true
     }
 
     // MARK: Landscape - Portrait
