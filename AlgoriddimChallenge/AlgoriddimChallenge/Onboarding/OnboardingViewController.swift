@@ -105,11 +105,11 @@ final class OnboardingViewController: UIViewController {
         layoutView(selectLevelView)
         layoutView(customView)
 
-        activateCurrentConstraints()
-
-        presentPage(pageIndex: viewModel.currentPage.rawValue)
+        activateConstraints()
 
         setupSwipeGestures()
+
+        welcomeView.isHidden = false
     }
 
     // MARK: Setup
@@ -185,10 +185,10 @@ final class OnboardingViewController: UIViewController {
     override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
         super.traitCollectionDidChange(previousTraitCollection)
 
-        activateCurrentConstraints()
+        activateConstraints()
     }
 
-    private func activateCurrentConstraints() {
+    private func activateConstraints() {
         NSLayoutConstraint.deactivate(sharedComponentsConstraints.portrait + sharedComponentsConstraints.landscape)
 
         if traitCollection.verticalSizeClass == .regular {
