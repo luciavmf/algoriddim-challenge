@@ -255,6 +255,6 @@ extension SelectSkillView: TransitionAnimatable {
     }
 
     func animateTransitionOut(backwards: Bool = false, completion: @escaping () -> Void = { }) {
-        slideAnimate(direction: .middleToLeft, backwards: backwards, completion: completion)
+        fadeOut(duration: AnimationDuration.medium, delay: backwards ? AnimationDuration.normal : 0, backwards: backwards, completion: completion)
     }
 }

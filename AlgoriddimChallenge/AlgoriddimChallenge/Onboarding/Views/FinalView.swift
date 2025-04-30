@@ -73,19 +73,22 @@ final class FinalView: UIView {
         confiure()
     }
 
+    public lazy var particlesBackgroundView: ParticlesBackgroundView = {
+        let particles = ParticlesBackgroundView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
+        particles.translatesAutoresizingMaskIntoConstraints = false
+        return particles
+    }()
+
     // MARK: Configure
 
     func confiure() {
-        let particles = ParticlesBackgroundView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height))
-        particles.translatesAutoresizingMaskIntoConstraints = false
-        particles.clipsToBounds = true
-        addSubview(particles)
+        addSubview(particlesBackgroundView)
 
         NSLayoutConstraint.activate([
-            particles.leadingAnchor.constraint(equalTo: leadingAnchor),
-            particles.trailingAnchor.constraint(equalTo: trailingAnchor),
-            particles.topAnchor.constraint(equalTo: topAnchor),
-            particles.bottomAnchor.constraint(equalTo: bottomAnchor)
+            particlesBackgroundView.leadingAnchor.constraint(equalTo: leadingAnchor),
+            particlesBackgroundView.trailingAnchor.constraint(equalTo: trailingAnchor),
+            particlesBackgroundView.topAnchor.constraint(equalTo: topAnchor),
+            particlesBackgroundView.bottomAnchor.constraint(equalTo: bottomAnchor)
         ])
 
         addSubview(stackView)
@@ -107,7 +110,44 @@ final class FinalView: UIView {
 
 extension FinalView: TransitionAnimatable {
     func animateTransitionIn(backwards: Bool, completion: @escaping () -> Void) {
-        slideAnimate(direction: .rightToMiddle, backwards: backwards, completion: completion)
+        let group = DispatchGroup()
+
+        group.enter()
+        particlesBackgroundView.fadeIn(duration: AnimationDuration.fast, delay: backwards ? AnimationDuration.slow : 0, backwards: backwards, completion: {
+            group.leave()
+        })
+
+        if backwards {
+            stackView.alpha = 1
+            stackView.transform = .identity
+        } else {
+            stackView.alpha = 0
+            stackView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+        }
+        group.enter()
+        UIView.animate(
+            withDuration: AnimationDuration.slow,
+            delay: backwards ? 0 : AnimationDuration.fast,
+            usingSpringWithDamping: 0.7,
+            initialSpringVelocity: 0.8,
+            options: [.curveEaseInOut],
+            animations: { [weak self] in
+                guard let self else { return }
+                if backwards {
+                    stackView.alpha = 0
+                    stackView.transform = CGAffineTransform(scaleX: 0.3, y: 0.5)
+                } else {
+                    stackView.alpha = 1
+                    stackView.transform = .identity
+                }
+            },
+            completion: { _ in
+                group.leave()
+            })
+
+        group.notify(queue: .main) {
+            completion()
+        }
     }
 
     func animateTransitionOut(backwards: Bool, completion: @escaping () -> Void) {
